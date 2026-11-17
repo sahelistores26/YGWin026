@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YGWin - Game</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { background-color: #0b0f19; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        .container { width: 100%; max-width: 480px; background: #0f172a; min-height: 100vh; position: relative; padding-bottom: 75px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-left: 1px solid #1e293b; border-right: 1px solid #1e293b; }
+        .hidden { display: none !important; }
+        
+        /* Auth Screens Exact Match */
+        .auth-screen { padding: 20px; display: flex; flex-direction: column; min-height: 100vh; background: #0f172a; }
+        .auth-top-header { background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); margin: -20px -20px 20px -20px; padding: 25px 20px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; text-align: left; }
+        .auth-top-header h2 { color: #ffffff; font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+        .auth-top-header p { color: #e2e8f0; font-size: 11px; line-height: 1.3; opacity: 0.9; }
+        
+        .auth-tab-box { display: flex; justify-content: center; align-items: center; background: #1e293b; border-radius: 10px; padding: 10px; margin-bottom: 15px; text-align: center; }
+        .auth-tab-box div { font-size: 13px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+        .input-group { margin-bottom: 14px; }
+        .input-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
+        
+        .phone-input-wrap { display: flex; background: #1e293b; border: 1px solid #334155; border-radius: 8px; overflow: hidden; }
+        .phone-prefix { background: #1e293b; color: #f8fafc; padding: 10px 12px; font-weight: 700; font-size: 13px; border-right: 1px solid #334155; display: flex; align-items: center; gap: 4px; }
+        .phone-input-wrap input { flex: 1; border: none; background: transparent; padding: 10px 12px; color: #fff; font-size: 13px; outline: none; }
+
+        .input-group input.standard-input { width: 100%; padding: 10px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
+        .input-group input:focus { border-color: #2563eb; }
+
+        .auth-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; border-radius: 20px; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 12px; box-shadow: 0 4px 10px rgba(37,99,235,0.3); transition: opacity 0.2s; }
+        .auth-btn:active { opacity: 0.9; }
+        
+        .auth-secondary-btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #334155; border-radius: 20px; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; text-align: center; }
+
+        /* Game Header & Wallet */
+        .header { background: #0f172a; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; }
+        .logo { font-size: 18px; font-weight: 900; font-style: italic; color: #3b82f6; letter-spacing: 0.5px; cursor: pointer; user-select: none; }
+        
+        .top-nav-boxes { display: flex; gap: 6px; align-items: center; }
+        .nav-box-btn { background: #1e293b; border: 1px solid #334155; width: 30px; height: 30px; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 13px; color: #cbd5e1; }
+        .nav-box-btn:active { background: #2563eb; color: #fff; }
+
+        .wallet-card { background: linear-gradient(135deg, #2563eb, #1d4ed8); margin: 12px 15px; padding: 18px; border-radius: 12px; text-align: center; color: #ffffff; box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+        .wallet-card h3 { font-size: 13px; color: #dbeafe; font-weight: normal; }
+        .wallet-card h1 { font-size: 28px; margin: 6px 0; font-weight: 800; }
+        .wallet-btns { display: flex; gap: 8px; margin-top: 12px; }
+        .wallet-btns button { flex: 1; padding: 9px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
+
+        /* Timer Tabs & Game Section */
+        .timer-tabs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 15px 12px 15px; }
+        .timer-tab-btn { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 2px; text-align: center; cursor: pointer; color: #94a3b8; font-size: 10px; font-weight: 700; transition: all 0.2s; white-space: nowrap; }
+        .timer-tab-btn.active { background: linear-gradient(135deg, #2563eb, #1d4ed8); border-color: #3b82f6; color: #fff; box-shadow: 0 2px 6px rgba(37,99,235,0.4); }
+
+        .game-section { padding: 0 15px; }
+        .timer-box { background: #1e293b; border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border: 1px solid #334155; }
+        
+        .color-bet-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+        .color-bet-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; color: #fff; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .color-bet-btn.green { background: #10b981; }
+        .color-bet-btn.violet { background: #8b5cf6; }
+        .color-bet-btn.red { background: #ef4444; }
+
+        .number-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px; }
+        .num-circle { width: 100%; aspect-ratio: 1; border-radius: 50%; border: none; font-size: 15px; font-weight: 800; color: #fff; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: transform 0.1s; }
+        .num-circle:active { transform: scale(0.92); }
+        
+        .num-red-violet { background: linear-gradient(135deg, #ef4444 50%, #8b5cf6 50%); }
+        .num-red { background: #ef4444; }
+        .num-green-violet { background: linear-gradient(135deg, #10b981 50%, #8b5cf6 50%); }
+        .num-green { background: #10b981; }
+
+        .bet-buttons { display: flex; gap: 10px; margin-bottom: 12px; }
+        .bet-btn-bigsmall { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 800; cursor: pointer; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .bet-btn-bigsmall.big { background: #f59e0b; }
+        .bet-btn-bigsmall.small { background: #3b82f6; }
+
+        /* History Nav Tabs */
+        .history-nav-tabs { display: flex; background: #1e293b; border-radius: 8px; padding: 3px; margin-bottom: 10px; border: 1px solid #334155; }
+        .hist-tab-btn { flex: 1; padding: 7px; border: none; background: transparent; color: #94a3b8; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; text-align: center; }
+        .hist-tab-btn.active { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+
+        /* History Table - Full Period Number Support */
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 4px; background: #0f172a; border-radius: 8px; overflow: hidden; font-size: 11px; border: 1px solid #1e293b; }
+        .history-table th, .history-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #1e293b; color: #e2e8f0; word-break: break-all; }
+        .history-table th { background: #1e293b; color: #94a3b8; font-size: 10px; font-weight: 700; }
+
+        /* Color Dot Indicators for History */
+        .dot-container { display: flex; justify-content: center; align-items: center; gap: 4px; }
+        .history-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-red { background-color: #ef4444; }
+        .dot-green { background-color: #10b981; }
+        .dot-violet { background-color: #8b5cf6; }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; padding: 6px 0; z-index: 900; }
+        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #94a3b8; font-size: 10px; font-weight: 600; text-decoration: none; flex: 1; }
+        .bottom-nav-item.active { color: #3b82f6; }
+        .bottom-nav-item span.icon { font-size: 18px; margin-bottom: 1px; }
+        
+        .bottom-nav-center { position: relative; top: -16px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .bottom-nav-center .diamond-bg { width: 46px; height: 46px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(59,130,246,0.5); border: 2px solid #60a5fa; font-size: 22px; }
+        .bottom-nav-center span { font-size: 10px; font-weight: 700; color: #f8fafc; margin-top: 2px; }
+
+        /* Home Page Game Grid Styles */
+        .home-section-title { font-size: 15px; font-weight: 800; color: #f8fafc; margin: 12px 15px 8px 15px; display: flex; align-items: center; gap: 6px; border-left: 4px solid #3b82f6; padding-left: 6px; }
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 15px 12px 15px; }
+        .game-card-item { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+        .game-card-item:hover { transform: translateY(-2px); border-color: #3b82f6; }
+        .game-card-icon { font-size: 24px; margin-bottom: 4px; }
+        .game-card-name { font-size: 11px; font-weight: 700; color: #f8fafc; }
+
+        /* Popups / Modals */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.8); backdrop-filter: blur(2px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #0f172a; padding: 18px; border-radius: 14px; width: 90%; max-width: 380px; text-align: center; border: 1px solid #1e293b; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); color: #f8fafc; }
+        .modal-content h3 { margin-bottom: 10px; color: #f8fafc; font-size: 16px; font-weight: 700; }
+        .modal-content input, .modal-content select { width: 100%; padding: 9px 10px; background: #1e293b; border: 1px solid #334155; border-radius: 7px; color: #f8fafc; margin-bottom: 8px; font-size: 12px; outline: none; }
+        .modal-content input:focus { border-color: #3b82f6; }
+        .qr-container { background: #1e293b; padding: 8px; display: inline-block; border-radius: 8px; margin-bottom: 12px; border: 1px solid #334155; }
+        .qr-container img { width: 130px; height: 130px; display: block; object-fit: contain; }
+
+        /* Bet Modal Overlay */
+        .bet-modal-overlay { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #0f172a; border-top-left-radius: 16px; border-top-right-radius: 16px; border: 1px solid #334155; padding: 16px; z-index: 1100; box-shadow: 0 -5px 25px rgba(0,0,0,0.6); animation: slideUp 0.25s ease-out; }
+        @keyframes slideUp { 0% { transform: translate(-50%, 100%); } 100% { transform: translate(-50%, 0); } }
+
+        /* Result Popup Banner Overlay */
+        .result-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .result-box { padding: 25px 40px; border-radius: 14px; font-size: 28px; font-weight: 800; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: popIn 0.3s ease-out; }
+        .result-box.winner { background: #10b981; color: #fff; }
+        .result-box.lose { background: #ef4444; color: #fff; }
+        .result-box.access-popup { font-size: 18px; padding: 16px 28px; }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        /* ADMIN PANEL (WHITE BACKGROUND WITH BLUE DRAWER) */
+        .admin-screen-white { background: #f8fafc !important; color: #0f172a !important; padding: 0 !important; min-height: 100vh; position: relative; }
+        .admin-header-bar { background: #2563eb; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .admin-hamburger { font-size: 20px; cursor: pointer; background: transparent; border: none; color: #fff; }
+        
+        .admin-drawer { position: fixed; top: 0; left: -260px; width: 260px; height: 100%; background: #1e40af; color: #fff; z-index: 3000; transition: left 0.3s ease; box-shadow: 4px 0 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        .admin-drawer.open { left: 0; }
+        .drawer-header { background: #1d4ed8; padding: 16px; font-size: 16px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .drawer-menu-list { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .drawer-menu-item { padding: 10px 12px; background: rgba(255,255,255,0.1); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: background 0.2s; }
+        .drawer-menu-item:hover { background: rgba(255,255,255,0.2); }
+        
+        .admin-section-content { padding: 12px; overflow-y: auto; max-height: calc(100vh - 50px); }
+        .admin-card-white { background: #ffffff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: left; font-size: 12px; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .admin-card-white span { font-weight: bold; color: #2563eb; }
+        .admin-card-white label { display: block; font-weight: 600; color: #475569; margin-bottom: 4px; }
+        
+        .bet-history-card { background:#1e293b; padding:8px 10px; margin-bottom:6px; border-radius:8px; border:1px solid #334155; font-size: 11px; line-height: 1.4; }
+        .bet-history-card b { color: #f8fafc; }
+        
+        .qr-thumb-admin { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <!-- REGISTER SCREEN -->
+    <div id="registerScreen" class="auth-screen hidden">
+        <div class="auth-top-header">
+            <h2>YGWin</h2>
+            <p>Please register by phone number</p>
+        </div>
+        
+        <div class="auth-tab-box">
+            <div>📱 Register your phone</div>
+        </div>
+
+        <div class="input-group">
+            <label>Phone number</label>
+            <div class="phone-input-wrap">
+                <div class="phone-prefix">+91</div>
+                <input type="number" id="regPhone" placeholder="Please enter the phone number">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Set password</label>
+            <input type="password" id="regPass" class="standard-input" placeholder="Set password">
+        </div>
+
+        <div class="input-group">
+            <label>Confirm password</label>
+            <input type="password" id="regCpass" class="standard-input" placeholder="Confirm password">
+        </div>
+
+        <div class="input-group">
+            <label>Invite code</label>
+            <input type="text" id="regInviteCode" class="standard-input" placeholder="Please enter invite code (Optional)">
+        </div>
+
+        <button class="auth-btn" onclick="registerUser()">Register</button>
+        <button class="auth-secondary-btn" onclick="switchScreen('loginScreen')">I have an account Login</button>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="auth-screen hidden">
+        <div class="auth-top-header">
+            <h2>Log in</h2>
+            <p>Please log in with your phone number<br>If you forget your password, please contact customer service</p>
+        </div>
+
+        <div class="auth-tab-box">
+            <div>📱 Phone Number</div>
+        </div>
+
+        <div class="input-group">
+            <label>Phone number</label>
+            <div class="phone-input-wrap">
+                <div class="phone-prefix">+91</div>
+                <input type="text" id="logPhone" placeholder="Please enter the phone number">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="logPass" class="standard-input" placeholder="Password">
+        </div>
+
+        <button class="auth-btn" onclick="loginUser()">Log In</button>
+        <button class="auth-secondary-btn" onclick="switchScreen('registerScreen')">Register</button>
+    </div>
+
+    <!-- HOME PAGE SCREEN -->
+    <div id="homeScreen" class="hidden">
+        <div class="header">
+            <div class="logo" onclick="handleLogoClick()">YGWin</div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div id="homeUserDisplay" style="font-size: 9px; color: #94a3b8; line-height: 1.1; text-align: right; font-weight: 700; white-space: nowrap;"></div>
+            </div>
+        </div>
+
+        <div class="home-section-title">🎰 Lottery Games</div>
+        <div class="game-grid">
+            <div class="game-card-item" onclick="openGame('WinGo')">
+                <div class="game-card-icon">🎱</div>
+                <div class="game-card-name">WINGO</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('K3')">
+                <div class="game-card-icon">🎲</div>
+                <div class="game-card-name">K3</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('5D')">
+                <div class="game-card-icon">🔮</div>
+                <div class="game-card-name">5D</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('Trx WinGo')">
+                <div class="game-card-icon">🪙</div>
+                <div class="game-card-name">Trx WinGo</div>
+            </div>
+        </div>
+
+        <div class="home-section-title">🚀 Original & Popular Games</div>
+        <div class="game-grid">
+            <div class="game-card-item" onclick="showComingSoon('Aviator')">
+                <div class="game-card-icon">✈️</div>
+                <div class="game-card-name">AVIATOR</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('Fortune Gems')">
+                <div class="game-card-icon">👑</div>
+                <div class="game-card-name">Fortune Gems</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('Mines')">
+                <div class="game-card-icon">💣</div>
+                <div class="game-card-name">MINES</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('Boom')">
+                <div class="game-card-icon">💥</div>
+                <div class="game-card-name">BOOM</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('Super Ace')">
+                <div class="game-card-icon">🃏</div>
+                <div class="game-card-name">Super Ace</div>
+            </div>
+            <div class="game-card-item" onclick="showComingSoon('Slots')">
+                <div class="game-card-icon">🎰</div>
+                <div class="game-card-name">Slots 777</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WINGO GAME MAIN SCREEN -->
+    <div id="gameScreen" class="hidden">
+        <div class="header">
+            <div class="logo" onclick="handleLogoClick()">YGWin</div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div id="userDisplay" style="font-size: 9px; color: #94a3b8; line-height: 1.1; text-align: right; font-weight: 700; white-space: nowrap;"></div>
+                <div class="top-nav-boxes">
+                    <div class="nav-box-btn" onclick="openDepositHistory()" title="Deposit History">📥</div>
+                    <div class="nav-box-btn" onclick="openWithdrawHistory()" title="Withdraw History">📤</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wallet-card">
+            <h3>Wallet Balance</h3>
+            <h1>₹<span id="walletBalance">0.00</span></h1>
+            <div class="wallet-btns">
+                <button class="auth-btn" style="margin:0; background:#ef4444; padding:8px;" onclick="openDeposit()">Deposit</button>
+                <button class="auth-btn" style="margin:0; background:#d97706; padding:8px;" onclick="openWithdrawModal()">Withdraw</button>
+            </div>
+        </div>
+
+        <!-- 30s, 1m, 3m, 5m Timer Tabs -->
+        <div class="timer-tabs-grid">
+            <div class="timer-tab-btn" onclick="switchTimerTab('30s')">WinGo 30s</div>
+            <div class="timer-tab-btn active" id="tab1m" onclick="switchTimerTab('1m')">WinGo 1 Min</div>
+            <div class="timer-tab-btn" onclick="switchTimerTab('3m')">WinGo 3 Min</div>
+            <div class="timer-tab-btn" onclick="switchTimerTab('5m')">WinGo 5 Min</div>
+        </div>
+
+        <div class="game-section">
+            <div class="timer-box">
+                <div>
+                    <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">WinGo 1 Min</div>
+                    <div id="periodNumber" style="font-size: 13px; font-weight: 700; color: #f8fafc; margin-top: 2px;">--</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">Time remaining</div>
+                    <div id="timerClock" style="font-size: 18px; font-weight: 800; color: #3b82f6;">00:00</div>
+                </div>
+            </div>
+
+            <!-- Color Bet Bar -->
+            <div class="color-bet-bar">
+                <button class="color-bet-btn green" onclick="openBetModal('Green')">Green</button>
+                <button class="color-bet-btn violet" onclick="openBetModal('Violet')">Violet</button>
+                <button class="color-bet-btn red" onclick="openBetModal('Red')">Red</button>
+            </div>
+
+            <!-- Number Grid (0 to 9) -->
+            <div class="number-grid">
+                <button class="num-circle num-red-violet" onclick="openBetModal('0')">0</button>
+                <button class="num-circle num-green" onclick="openBetModal('1')">1</button>
+                <button class="num-circle num-red" onclick="openBetModal('2')">2</button>
+                <button class="num-circle num-green" onclick="openBetModal('3')">3</button>
+                <button class="num-circle num-red" onclick="openBetModal('4')">4</button>
+                <button class="num-circle num-green-violet" onclick="openBetModal('5')">5</button>
+                <button class="num-circle num-red" onclick="openBetModal('6')">6</button>
+                <button class="num-circle num-green" onclick="openBetModal('7')">7</button>
+                <button class="num-circle num-red" onclick="openBetModal('8')">8</button>
+                <button class="num-circle num-green" onclick="openBetModal('9')">9</button>
+            </div>
+
+            <!-- Big & Small Bet Buttons -->
+            <div class="bet-buttons">
+                <button class="bet-btn-bigsmall big" onclick="openBetModal('Big')">BIG</button>
+                <button class="bet-btn-bigsmall small" onclick="openBetModal('Small')">SMALL</button>
+            </div>
+
+            <!-- History Navigation Tabs (Game History, Chart, My History) -->
+            <div class="history-nav-tabs">
+                <button class="hist-tab-btn active" id="btnGameHist" onclick="switchHistTab('game')">Game history</button>
+                <button class="hist-tab-btn" id="btnChart" onclick="switchHistTab('chart')">Chart</button>
+                <button class="hist-tab-btn" id="btnMyHist" onclick="switchHistTab('my')">My history</button>
+            </div>
+
+            <!-- History Table / Content Area -->
+            <div id="historyTableContainer">
+                <table class="history-table">
+                    <thead>
+                        <tr id="histTableHeader">
+                            <th>Period</th>
+                            <th>Number</th>
+                            <th>Big Small</th>
+                            <th>Color</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <!-- History rows inserted dynamically -->
+                    </tbody>
+                </table>
+                <div id="clearMyHistContainer" class="hidden" style="margin-top: 8px; text-align: right;">
+                    <button class="auth-btn" style="padding: 6px 12px; font-size: 11px; width: auto; background: #ef4444; margin: 0;" onclick="clearMyBetHistory()">Clear History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVITY PAGE -->
+    <div id="activityScreen" class="hidden" style="padding: 20px; text-align: center;">
+        <h2 style="color: #3b82f6; margin-bottom: 15px;">Activity Center</h2>
+        <div style="background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 10px; margin-bottom: 12px;">
+            <h3 style="color: #f8fafc; margin-bottom: 6px;">🎁 Daily Attendance Bonus</h3>
+            <p style="font-size: 12px; color: #94a3b8;">Check in daily to claim exciting rewards and bonus credits!</p>
+            <button class="auth-btn" style="margin-top: 10px;" onclick="alert('Attendance reward claimed successfully!')">Check In</button>
+        </div>
+        <div style="background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 10px;">
+            <h3 style="color: #f8fafc; margin-bottom: 6px;">🏆 Super Jackpot Event</h3>
+            <p style="font-size: 12px; color: #94a3b8;">Participate in weekly high roller tournaments and win big prizes.</p>
+        </div>
+    </div>
+
+    <!-- PROMOTION PAGE -->
+    <div id="promotionScreen" class="hidden" style="padding: 20px; text-align: center;">
+        <h2 style="color: #3b82f6; margin-bottom: 15px;">Agency Promotion</h2>
+        <div style="background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 10px; margin-bottom: 12px;">
+            <h3 style="color: #f8fafc; margin-bottom: 6px;">Invite Friends & Earn Commission</h3>
+            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">Share your invite code with friends. When they deposit, agent workers get salary rewards!</p>
+            <div style="font-size: 13px; font-weight: bold; color: #10b981; background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid #334155;" id="promoCodeBox">--</div>
+            <button class="auth-btn" style="margin-top: 10px;" onclick="copyInviteCode()">Copy Invite Code</button>
+        </div>
+    </div>
+
+    <!-- WALLET PAGE -->
+    <div id="walletScreen" class="hidden" style="padding: 14px;">
+        <h2 style="color: #3b82f6; margin-bottom: 12px; text-align: center;">My Wallet</h2>
+        <div class="wallet-card" style="margin: 0 0 12px 0;">
+            <h3>Total Balance</h3>
+            <h1>₹<span id="walletScreenBalance">0.00</span></h1>
+            <div class="wallet-btns">
+                <button class="auth-btn" style="margin:0; background:#ef4444; padding:8px;" onclick="openDeposit()">Deposit</button>
+                <button class="auth-btn" style="margin:0; background:#d97706; padding:8px;" onclick="openWithdrawModal()">Withdraw</button>
+            </div>
+        </div>
+
+        <div style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 6px;">Deposit History</div>
+        <div id="walletDepHistory" style="max-height: 130px; overflow-y: auto; margin-bottom: 12px;"></div>
+
+        <div style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 6px;">Withdraw History</div>
+        <div id="walletWitHistory" style="max-height: 130px; overflow-y: auto; margin-bottom: 12px;"></div>
+
+        <button class="auth-btn" style="background:#ef4444;" onclick="clearCurrentHistory()">Clear History</button>
+    </div>
+
+    <!-- ACCOUNT PAGE -->
+    <div id="accountScreen" class="hidden" style="padding: 16px;">
+        <div style="background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 16px;">
+            <div style="font-size: 36px; margin-bottom: 6px;">👤</div>
+            <div id="accPhoneDisplay" style="font-size: 15px; font-weight: 800; color: #f8fafc;">--</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 3px;">UID: <b id="accUidDisplay" style="color: #3b82f6; cursor: pointer;" onclick="copyUid()">-- 📋</b></div>
+            <div style="font-size: 12px; color: #dbeafe; margin-top: 8px;">My Invite Code: <b id="myInviteCodeDisplay" style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; cursor: pointer;" onclick="copyInviteCode()">--</b></div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <button class="auth-btn" style="margin:0; background:#10b981; padding:10px;" onclick="openDeposit()">Deposit</button>
+            <button class="auth-btn" style="margin:0; background:#d97706; padding:10px;" onclick="openWithdrawModal()">Withdraw</button>
+        </div>
+
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden; margin-bottom: 16px;">
+            <div style="padding: 12px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; font-size: 12px;"><span>VIP Level</span><span style="color: #f59e0b; font-weight: bold;">VIP 0</span></div>
+            <div style="padding: 12px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; font-size: 12px;"><span>Language</span><span style="color: #94a3b8;">English</span></div>
+            <div style="padding: 12px; display: flex; justify-content: space-between; font-size: 12px;"><span>Notifications</span><span style="color: #10b981;">Enabled</span></div>
+        </div>
+
+        <button class="auth-btn" style="background: #ef4444;" onclick="confirmLogout()">Log Out</button>
+    </div>
+
+    <!-- ADMIN PANEL SCREEN (WHITE BG WITH BLUE DRAWER) -->
+    <div id="adminScreen" class="hidden admin-screen-white">
+        <div class="admin-header-bar">
+            <button class="admin-hamburger" onclick="toggleAdminDrawer()">☰</button>
+            <div>YGWin Admin Control</div>
+            <button class="auth-btn" style="padding: 5px 10px; width:auto; margin:0; background:#ef4444; color:#fff; font-size:11px;" onclick="adminExitToHome()">Home</button>
+        </div>
+
+        <!-- Blue Navigation Drawer -->
+        <div id="adminDrawer" class="admin-drawer">
+            <div class="drawer-header">
+                <span>Admin Menu</span>
+                <span style="cursor:pointer; font-size:18px;" onclick="toggleAdminDrawer()">✕</span>
+            </div>
+            <div class="drawer-menu-list">
+                <div class="drawer-menu-item" onclick="switchAdminTab('users')">👥 Total Users (Real)</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('demoUsers')">🤖 Demo Accounts</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('agentWorker')">👷 Agent Worker</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('agentSalary')">💰 Agent Salary</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('control')">⚙️ Game Control</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('deposits')">📥 Deposit Requests</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('withdraws')">📤 Withdrawal Requests</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('depositHistory')">📥 Deposit Request History</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('withdrawHistory')">📤 Withdrawal Request History</div>
+                <div class="drawer-menu-item" onclick="switchAdminTab('createAdmin')">🔑 Create Admin</div>
+            </div>
+        </div>
+
+        <div class="admin-section-content">
+            <!-- TAB 1: USERS (REAL) -->
+            <div id="admTabUsers" class="adm-tab-pane">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px;">
+                    <div class="admin-card-white" style="text-align:center;">
+                        <div style="color: #475569; font-size: 11px; font-weight:600;">Total Real Users</div>
+                        <div id="admTotalRealUsers" style="font-size: 22px; font-weight:800; margin-top:3px; color:#2563eb;">0</div>
+                    </div>
+                </div>
+                <div class="admin-card-white">
+                    <div><strong>Real User Management (Full Height View)</strong></div>
+                    <div style="margin-top: 6px;">
+                        <input type="text" id="admUserSearchUid" placeholder="🔍 Search User UID..." style="width: 100%; padding: 7px 10px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; outline: none; color:#0f172a;" oninput="renderAdminPanel()">
+                    </div>
+                    <div id="admUserList" style="margin-top: 6px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: DEMO USERS -->
+            <div id="admTabDemoUsers" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div><strong>🤖 Create Demo Account</strong></div>
+                    <p style="font-size: 11px; color: #475569; margin: 4px 0 8px 0;">Create a demo account with any digit phone number & password.</p>
+                    <input type="text" id="demoPhoneInput" placeholder="Enter Any Digit Phone Number" style="width:100%; padding:8px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:6px; font-size:12px; color:#0f172a;">
+                    <input type="password" id="demoPassInput" placeholder="Enter Password" style="width:100%; padding:8px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:8px; font-size:12px; color:#0f172a;">
+                    <button class="auth-btn" style="background:#10b981; margin:0;" onclick="createDemoAccountByAdmin()">Create Demo Account</button>
+                </div>
+
+                <div class="admin-card-white">
+                    <div><strong>Demo Accounts List</strong></div>
+                    <div id="admDemoUserList" style="margin-top: 6px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 3: AGENT WORKER -->
+            <div id="admTabAgentWorker" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div><strong>👷 Agent Workers List</strong></div>
+                    <p style="font-size: 11px; color: #475569; margin: 4px 0 8px 0;">Users assigned as agent workers from Total Users.</p>
+                    <div id="admAgentWorkerList" style="margin-top: 6px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 4: AGENT SALARY -->
+            <div id="admTabAgentSalary" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div><strong>💰 Agent Salary Management (5% Deposit Reward)</strong></div>
+                    <p style="font-size: 11px; color: #475569; margin: 4px 0 8px 0;">Credit 5% commission of invited users' deposits to Agent Workers.</p>
+                    <div id="admAgentSalaryList" style="margin-top: 6px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 5: GAME CONTROL -->
+            <div id="admTabControl" class="adm-tab-pane hidden">
+                <!-- LIVE BET BREAKDOWN CARD -->
+                <div class="admin-card-white">
+                    <div><strong>📊 Live Bets Breakdown (Current Period: <span id="admLivePeriodTitle">--</span>)</strong></div>
+                    <div id="admLiveBetsSummary" style="margin-top: 8px; font-size: 11px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+
+                <div class="admin-card-white">
+                    <div><strong>Game Control & Outcome Override</strong></div>
+                    <div style="margin-top: 5px; font-size: 12px; color: #475569;">Current Period: <span id="admCurrentPeriod" style="color:#2563eb; font-weight:bold;">--</span></div>
+                    <div style="margin-top: 4px; font-size: 12px; color: #475569;">Timer: <span id="admTimerDisplay" style="color:#ef4444; font-weight:bold;">--</span></div>
+                    
+                    <div style="margin-top: 10px;">
+                        <label>Select Outcome Number for Current Period (0-9):</label>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 4px;">
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#ef4444; font-size:13px;" onclick="adminForceNumber(0)">0</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#10b981; font-size:13px;" onclick="adminForceNumber(1)">1</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#ef4444; font-size:13px;" onclick="adminForceNumber(2)">2</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#10b981; font-size:13px;" onclick="adminForceNumber(3)">3</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#ef4444; font-size:13px;" onclick="adminForceNumber(4)">4</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#10b981; font-size:13px;" onclick="adminForceNumber(5)">5</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#ef4444; font-size:13px;" onclick="adminForceNumber(6)">6</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#10b981; font-size:13px;" onclick="adminForceNumber(7)">7</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#ef4444; font-size:13px;" onclick="adminForceNumber(8)">8</button>
+                            <button class="auth-btn" style="margin:0; padding:8px; background:#10b981; font-size:13px;" onclick="adminForceNumber(9)">9</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <label for="admForceOutcome">Or Select Algorithm Mode (40% Win / 60% Loss when active):</label>
+                        <select id="admForceOutcome" style="width:100%; padding:8px; background:#f1f5f9; border:1px solid #cbd5e1; color:#0f172a; border-radius:6px; margin-top:3px; font-weight:600; font-size:12px;">
+                            <option value="">1. Pure Random (Default when no bets)</option>
+                            <option value="streak_loss">2. Anti-Streak Loss Engine (40% Win / 60% Loss)</option>
+                            <option value="least_pool_wins">3. Pool Anti-Whale Engine (Least Pool Wins)</option>
+                        </select>
+                        <button class="auth-btn" style="padding: 9px; margin-top: 6px;" onclick="saveAdminOverride()">Save Algorithm Selection</button>
+                    </div>
+                </div>
+
+                <div class="admin-card-white">
+                    <div><strong>Last 10 Game Results</strong></div>
+                    <div id="admLast10Results" style="margin-top: 6px; font-size: 11px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 6: DEPOSITS -->
+            <div id="admTabDeposits" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div><strong>Global Deposit QR Code</strong></div>
+                    <div style="margin-top: 4px; color: #475569;">Current Status: <span id="admQrStatusText" style="color:#10b981;">Checking...</span></div>
+                    <div style="margin-top: 6px; text-align: center;" id="admQrPreviewContainer" class="hidden">
+                        <img id="admUploadedQrPreview" src="" alt="Uploaded QR" style="width: 90px; height: 90px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px; background: #fff;">
+                    </div>
+                    <div style="margin-top: 6px; color: #475569;">Upload/Replace QR Code from Gallery:</div>
+                    <input type="file" id="admQrFile" accept="image/*" style="margin-top:4px; font-size:11px; width:100%; padding:6px; background:#f1f5f9; border:1px solid #cbd5e1; color:#0f172a; border-radius:6px;" onchange="handleAdminQrUpload(event)">
+                    <button class="auth-btn" style="padding: 9px; margin-top: 6px; background:#10b981;" onclick="saveAdminQr()">Update Global Deposit QR</button>
+                </div>
+
+                <div class="admin-card-white">
+                    <div><strong>Deposit Approvals</strong></div>
+                    <div id="admDepositList" style="margin-top: 6px; max-height: 220px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 7: WITHDRAWS -->
+            <div id="admTabWithdraws" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div><strong>Withdrawal Approvals (Double Click QR to Save Image)</strong></div>
+                    <div id="admWithdrawList" style="margin-top: 6px; max-height: 320px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 8: DEPOSIT REQUEST HISTORY (NEW DRAWER SECTION) -->
+            <div id="admTabDepositHistory" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong>📥 Deposit Request History (Accepted / Rejected)</strong>
+                        <button class="auth-btn" style="background:#ef4444; padding:5px 10px; font-size:11px; margin:0; width:auto;" onclick="adminClearDepositHistory()">Clear History</button>
+                    </div>
+                    <div id="admDepositHistoryList" style="max-height: 350px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 9: WITHDRAW REQUEST HISTORY (NEW DRAWER SECTION) -->
+            <div id="admTabWithdrawHistory" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong>📤 Withdrawal Request History (Accepted / Rejected)</strong>
+                        <button class="auth-btn" style="background:#ef4444; padding:5px 10px; font-size:11px; margin:0; width:auto;" onclick="adminClearWithdrawHistory()">Clear History</button>
+                    </div>
+                    <div id="admWithdrawHistoryList" style="max-height: 350px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 10: CREATE ADMIN -->
+            <div id="admTabCreateAdmin" class="adm-tab-pane hidden">
+                <div class="admin-card-white">
+                    <div><strong>Create New Admin Password</strong></div>
+                    <p style="font-size: 11px; color: #475569; margin: 4px 0 10px 0;">Add unlimited admin credentials to securely manage the platform.</p>
+                    <input type="text" id="newAdminUser" placeholder="Admin Username / Phone" style="width:100%; padding:9px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:6px; color:#0f172a; font-size:12px;">
+                    <input type="password" id="newAdminPass" placeholder="Admin Password" style="width:100%; padding:9px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:10px; color:#0f172a; font-size:12px;">
+                    <button class="auth-btn" style="background:#2563eb;" onclick="createNewAdminCred()">Save New Admin</button>
+                </div>
+
+                <!-- Existing Admin Credentials List -->
+                <div class="admin-card-white">
+                    <div><strong>Existing Admin Passwords</strong></div>
+                    <div id="admPassListContainer" style="margin-top: 6px; font-size: 11px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BET CONFIRMATION MODAL -->
+    <div id="betModal" class="bet-modal-overlay hidden">
+        <div style="font-size: 14px; font-weight: 800; color: #f8fafc; text-align: center; margin-bottom: 10px;" id="betModalTitle">WinGo 1 Min</div>
+        <div style="background: #1e293b; border-radius: 8px; padding: 8px; text-align: center; margin-bottom: 12px; border: 1px solid #334155;">
+            <span style="font-size: 13px; color: #94a3b8; font-weight: 600;">Selected: </span>
+            <span id="betModalChoice" style="font-size: 15px; font-weight: 800; color: #3b82f6;">--</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; color: #94a3b8;">
+            <span>Balance</span>
+            <div style="display: flex; gap: 4px;">
+                <button style="background: #d97706; border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;" onclick="setBetAmt(1)">1</button>
+                <button style="background: #334155; border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;" onclick="setBetAmt(10)">10</button>
+                <button style="background: #334155; border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;" onclick="setBetAmt(100)">100</button>
+                <button style="background: #334155; border: none; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;" onclick="setBetAmt(1000)">1000</button>
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+            <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Quantity</span>
+            <div style="display: flex; align-items: center; background: #1e293b; border: 1px solid #334155; border-radius: 6px; overflow: hidden; flex: 1; justify-content: space-between; padding: 3px 8px;">
+                <button style="background: #d97706; border: none; color: #fff; width: 24px; height: 24px; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="adjustQty(-1)">-</button>
+                <input type="number" id="betQtyInput" value="1" min="1" style="width: 45px; background: transparent; border: none; text-align: center; color: #fff; font-size: 15px; font-weight: bold; outline: none;" oninput="updateTotalBetAmt()">
+                <button style="background: #d97706; border: none; color: #fff; width: 24px; height: 24px; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="adjustQty(1)">+</button>
+            </div>
+        </div>
+
+        <!-- Multiplier Buttons (X1, X5, X10, X20, X50, X100) -->
+        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 12px;">
+            <button class="timer-tab-btn active" id="mul_1" onclick="setMultiplier(1)">X1</button>
+            <button class="timer-tab-btn" id="mul_5" onclick="setMultiplier(5)">X5</button>
+            <button class="timer-tab-btn" id="mul_10" onclick="setMultiplier(10)">X10</button>
+            <button class="timer-tab-btn" id="mul_20" onclick="setMultiplier(20)">X20</button>
+            <button class="timer-tab-btn" id="mul_50" onclick="setMultiplier(50)">X50</button>
+            <button class="timer-tab-btn" id="mul_100" onclick="setMultiplier(100)">X100</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #94a3b8; margin-bottom: 12px;">
+            <input type="checkbox" id="preSaleRulesCheck" checked style="accent-color: #2563eb;">
+            <label for="preSaleRulesCheck">I agree <span style="color: #3b82f6; cursor: pointer;">《Pre-sale rules》</span></label>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <button style="flex: 1; padding: 10px; background: #334155; border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 13px;" onclick="closeModals()">Cancel</button>
+            <button style="flex: 2; padding: 10px; background: #d97706; border: none; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 13px;" id="totalBetAmtBtn" onclick="confirmAndPlaceBet()">Total amount ₹1.00</button>
+        </div>
+    </div>
+
+    <!-- DEPOSIT MODAL -->
+    <div id="depositModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Deposit Funds (Min ₹10)</h3>
+            <div class="qr-container">
+                <img id="adminQrImg" src="" alt="QR Code">
+            </div>
+            <input type="number" id="depAmount" placeholder="Enter Deposit Amount (₹)">
+            <input type="text" id="depUtr" placeholder="Enter 12-Digit UTR Number">
+            <button class="auth-btn" style="background:#10b981; margin-top:8px;" onclick="submitDeposit()">Submit Deposit</button>
+            <button class="auth-secondary-btn" style="margin-top:5px;" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- WITHDRAWAL MODAL -->
+    <div id="withdrawModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>UPI Withdrawal</h3>
+            <div style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Fill all details & upload your payment QR code image</div>
+            <input type="text" id="witUpiName" placeholder="Full Name">
+            <input type="text" id="witUpiId" placeholder="UPI ID (e.g. user@upi)">
+            <input type="number" id="witUpiAmount" placeholder="Withdrawal Amount (₹)">
+            
+            <div style="text-align:left; margin-bottom:4px; font-size:11px; font-weight:600; color:#94a3b8;">Upload UPI QR Code Image (Gallery):</div>
+            <input type="file" id="witQrFile" accept="image/*" style="margin-bottom:10px; background:#1e293b; color:#fff; border:1px solid #334155; padding:5px; border-radius:6px;" onchange="handleUserWitQrUpload(event)">
+            
+            <button class="auth-btn" style="background:#d97706; margin-top:8px;" onclick="submitWithdrawalUPI()">Request Withdraw</button>
+            <button class="auth-secondary-btn" style="margin-top:5px;" onclick="closeModals()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- WINNER / LOSE / ACCESS POPUP OVERLAY -->
+    <div id="gameResultPopup" class="result-popup hidden">
+        <div id="resultBoxContent" class="result-box">Winner</div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <div id="bottomNavContainer" class="bottom-nav hidden">
+        <div class="bottom-nav-item" id="navHomeBtn" onclick="switchScreen('homeScreen')">
+            <span class="icon">🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="bottom-nav-item" id="navActivityBtn" onclick="switchScreen('activityScreen')">
+            <span class="icon">📅</span>
+            <span>Activity</span>
+        </div>
+        <div class="bottom-nav-center" onclick="switchScreen('promotionScreen')">
+            <div class="diamond-bg">💎</div>
+            <span>Promotion</span>
+        </div>
+        <div class="bottom-nav-item" id="navWalletBtn" onclick="switchScreen('walletScreen')">
+            <span class="icon">👛</span>
+            <span>Wallet</span>
+        </div>
+        <div class="bottom-nav-item" id="navAccountBtn" onclick="switchScreen('accountScreen')">
+            <span class="icon">👤</span>
+            <span>Account</span>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue, push, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRDjQ5rJw_ECS-JbQlNyrIi7muD3jRhfk",
+      authDomain: "ygwin-cec2d.firebaseapp.com",
+      databaseURL: "https://ygwin-cec2d-default-rtdb.firebaseio.com",
+      projectId: "ygwin-cec2d",
+      storageBucket: "ygwin-cec2d.firebasestorage.app",
+      messagingSenderId: "817999913352",
+      appId: "1:817999913352:web:e5270d62b73c727cee9a3d",
+      measurementId: "G-NGFH5XVXGS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    let db = {
+        users: {},
+        deposits: {},
+        withdraws: {},
+        history: {},
+        activeBets: {},
+        betsHistory: {},
+        userResults: {},
+        agentWorkers: {},
+        agentSalaryCredits: {},
+        qr: "",
+        control: { algorithm: "", forcedNumber: null },
+        adminPasses: { "Admin": "Myselfyg26" }
+    };
+
+    let currentUser = JSON.parse(localStorage.getItem('ygwin_current_user')) || null;
+    let currentScreen = localStorage.getItem('ygwin_current_screen') || 'homeScreen';
+    let calculatedPeriodStr = "";
+    let remainingSeconds = 0;
+    let lastSeenResultId = localStorage.getItem('ygwin_last_seen_result') || "";
+    let tempDepositQrBase64 = "";
+    let tempWithdrawQrBase64 = "";
+
+    let currentHistTab = 'game'; // 'game', 'chart', 'my'
+    let pendingBetChoice = "";
+    let baseBetUnit = 1;
+    let betMultiplier = 1;
+
+    onValue(ref(database, 'ygwin_db'), (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+            db = val;
+            if (!db.users) db.users = {};
+            if (!db.deposits) db.deposits = {};
+            if (!db.withdraws) db.withdraws = {};
+            if (!db.history) db.history = {};
+            if (!db.activeBets) db.activeBets = {};
+            if (!db.betsHistory) db.betsHistory = {};
+            if (!db.userResults) db.userResults = {};
+            if (!db.agentWorkers) db.agentWorkers = {};
+            if (!db.agentSalaryCredits) db.agentSalaryCredits = {};
+            if (!db.control) db.control = { algorithm: "", forcedNumber: null };
+            if (!db.adminPasses) db.adminPasses = { "Admin": "Myselfyg26" };
+        }
+
+        evaluateMissedPeriodsBackfill();
+        renderHistoryTable();
+
+        if (currentUser && !currentUser.isAdmin) {
+            let foundKey = null;
+            let foundUser = null;
+            for (let key in db.users) {
+                if (db.users[key].phone === currentUser.phone) {
+                    foundKey = key;
+                    foundUser = db.users[key];
+                    break;
+                }
+            }
+            
+            if (!foundUser) {
+                alert("Your account has been deleted by Admin.");
+                logout();
+                return;
+            }
+
+            if (!foundUser.isActive) {
+                alert("Your account has been deactivated by Admin.");
+                logout();
+                return;
+            }
+
+            currentUser = { ...foundUser, dbKey: foundKey };
+            localStorage.setItem('ygwin_current_user', JSON.stringify(currentUser));
+            
+            if(document.getElementById('walletBalance')) {
+                document.getElementById('walletBalance').innerText = Number(currentUser.balance).toFixed(2);
+                document.getElementById('walletScreenBalance').innerText = Number(currentUser.balance).toFixed(2);
+                if(document.getElementById('myInviteCodeDisplay')) {
+                    document.getElementById('myInviteCodeDisplay').innerText = currentUser.inviteCode || currentUser.uid;
+                }
+            }
+            if(document.getElementById('promoCodeBox')) {
+                document.getElementById('promoCodeBox').innerText = currentUser.inviteCode || currentUser.uid;
+            }
+            if(document.getElementById('accPhoneDisplay')) {
+                document.getElementById('accPhoneDisplay').innerText = currentUser.phone;
+                document.getElementById('accUidDisplay').innerText = currentUser.uid + " 📋";
+                if(document.getElementById('myInviteCodeDisplay')) {
+                    document.getElementById('myInviteCodeDisplay').innerText = currentUser.inviteCode || currentUser.uid;
+                }
+            }
+
+            if (db.userResults) {
+                let latestResKey = "";
+                let latestResObj = null;
+                for (let rKey in db.userResults) {
+                    let res = db.userResults[rKey];
+                    if (res.phone === currentUser.phone) {
+                        latestResKey = rKey;
+                        latestResObj = res;
+                    }
+                }
+                if (latestResObj && latestResKey !== lastSeenResultId) {
+                    if (Date.now() - latestResObj.timestamp < 90000) {
+                        lastSeenResultId = latestResKey;
+                        localStorage.setItem('ygwin_last_seen_result', lastSeenResultId);
+                        showResultPopup(latestResObj.isWin);
+                    } else {
+                        lastSeenResultId = latestResKey;
+                        localStorage.setItem('ygwin_last_seen_result', lastSeenResultId);
+                    }
+                }
+            }
+        }
+
+        if (currentUser && currentUser.isAdmin && document.getElementById('adminScreen') && !document.getElementById('adminScreen').classList.contains('hidden')) {
+            renderAdminPanel();
+        }
+    });
+
+    window.onload = function() {
+        checkAndProcessGlobalRounds();
+        setInterval(checkAndProcessGlobalRounds, 1000);
+
+        if (currentUser) {
+            if (currentUser.isAdmin) {
+                switchScreen('adminScreen');
+            } else {
+                switchScreen(currentScreen || 'homeScreen');
+            }
+        } else {
+            switchScreen('loginScreen');
+        }
+    };
+
+    window.switchScreen = function(screenId) {
+        document.getElementById('registerScreen').classList.add('hidden');
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('homeScreen').classList.add('hidden');
+        document.getElementById('gameScreen').classList.add('hidden');
+        document.getElementById('activityScreen').classList.add('hidden');
+        document.getElementById('promotionScreen').classList.add('hidden');
+        document.getElementById('walletScreen').classList.add('hidden');
+        document.getElementById('accountScreen').classList.add('hidden');
+        document.getElementById('adminScreen').classList.add('hidden');
+        
+        currentScreen = screenId;
+        localStorage.setItem('ygwin_current_screen', screenId);
+
+        let bottomNav = document.getElementById('bottomNavContainer');
+        if (currentUser && currentUser.isAdmin && screenId === 'adminScreen') {
+            bottomNav.classList.add('hidden');
+            document.getElementById('adminScreen').classList.remove('hidden');
+            renderAdminPanel();
+            return;
+        }
+
+        if (!currentUser || screenId === 'loginScreen' || screenId === 'registerScreen') {
+            bottomNav.classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
+            return;
+        }
+
+        bottomNav.classList.remove('hidden');
+        document.getElementById(screenId).classList.remove('hidden');
+
+        document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+        if(screenId === 'homeScreen' && document.getElementById('navHomeBtn')) document.getElementById('navHomeBtn').classList.add('active');
+        if(screenId === 'activityScreen' && document.getElementById('navActivityBtn')) document.getElementById('navActivityBtn').classList.add('active');
+        if(screenId === 'walletScreen' && document.getElementById('navWalletBtn')) document.getElementById('navWalletBtn').classList.add('active');
+        if(screenId === 'accountScreen' && document.getElementById('navAccountBtn')) document.getElementById('navAccountBtn').classList.add('active');
+
+        if(screenId === 'homeScreen' || screenId === 'gameScreen' || screenId === 'walletScreen' || screenId === 'accountScreen') {
+            if(currentUser) {
+                let displayStr = `Ph:${currentUser.phone}<br>UID:${currentUser.uid}`;
+                if(document.getElementById('userDisplay')) document.getElementById('userDisplay').innerHTML = displayStr;
+                if(document.getElementById('homeUserDisplay')) document.getElementById('homeUserDisplay').innerHTML = displayStr;
+                if(document.getElementById('walletBalance')) document.getElementById('walletBalance').innerText = Number(currentUser.balance).toFixed(2);
+                if(document.getElementById('walletScreenBalance')) document.getElementById('walletScreenBalance').innerText = Number(currentUser.balance).toFixed(2);
+                if(document.getElementById('myInviteCodeDisplay')) document.getElementById('myInviteCodeDisplay').innerText = currentUser.inviteCode || currentUser.uid;
+                if(document.getElementById('promoCodeBox')) document.getElementById('promoCodeBox').innerText = currentUser.inviteCode || currentUser.uid;
+                if(document.getElementById('accPhoneDisplay')) {
+                    document.getElementById('accPhoneDisplay').innerText = currentUser.phone;
+                    document.getElementById('accUidDisplay').innerText = currentUser.uid + " 📋";
+                    if(document.getElementById('myInviteCodeDisplay')) document.getElementById('myInviteCodeDisplay').innerText = currentUser.inviteCode || currentUser.uid;
+                }
+            }
+            if(screenId === 'walletScreen') {
+                renderWalletHistories();
+            }
+        }
+    }
+
+    window.openGame = function(gameName) {
+        if(gameName === 'WinGo') {
+            switchScreen('gameScreen');
+        } else {
+            alert(`${gameName} is Coming Soon! Stay tuned.`);
+        }
+    }
+
+    window.showComingSoon = function(gameName) {
+        alert(`${gameName} is Coming Soon! Professional game launch in progress.`);
+    }
+
+    window.switchTimerTab = function(tabName) {
+        if(tabName === '1m') {
+            document.querySelectorAll('.timer-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab1m').classList.add('active');
+        } else {
+            alert(`WinGo ${tabName} is Coming Soon! Only WinGo 1 Min is currently active.`);
+        }
+    }
+
+    window.switchHistTab = function(tabType) {
+        currentHistTab = tabType;
+        document.getElementById('btnGameHist').classList.remove('active');
+        document.getElementById('btnChart').classList.remove('active');
+        document.getElementById('btnMyHist').classList.remove('active');
+
+        if(tabType === 'game') document.getElementById('btnGameHist').classList.add('active');
+        if(tabType === 'chart') document.getElementById('btnChart').classList.add('active');
+        if(tabType === 'my') document.getElementById('btnMyHist').classList.add('active');
+
+        renderHistoryTable();
+    }
+
+    window.copyInviteCode = function() {
+        if(currentUser && currentUser.inviteCode) {
+            navigator.clipboard.writeText(currentUser.inviteCode);
+            alert("Invite code copied to clipboard: " + currentUser.inviteCode);
+        }
+    }
+
+    window.copyUid = function() {
+        if(currentUser && currentUser.uid) {
+            navigator.clipboard.writeText(currentUser.uid);
+            alert("UID copied to clipboard: " + currentUser.uid);
+        }
+    }
+
+    window.registerUser = function() {
+        let phone = document.getElementById('regPhone').value.trim();
+        let pass = document.getElementById('regPass').value.trim();
+        let cpass = document.getElementById('regCpass').value.trim();
+        let inviteCodeInput = document.getElementById('regInviteCode').value.trim();
+
+        if(!phone || !pass || !cpass) { alert("Please fill all fields"); return; }
+        if(pass !== cpass) { alert("Password and Confirm Password do not match!"); return; }
+
+        get(ref(database, 'ygwin_db/users')).then((snapshot) => {
+            let usersObj = snapshot.val() || {};
+            let existing = false;
+            for(let k in usersObj) {
+                if(usersObj[k].phone === phone) { existing = true; break; }
+            }
+            if(existing) { alert("Phone number already registered!"); return; }
+
+            let uniqueUid = Math.floor(100000 + Math.random() * 900000);
+            let uniqueInviteCode = "YG" + Math.floor(100000 + Math.random() * 900000);
+
+            let newUser = {
+                phone: phone,
+                pass: pass,
+                balance: 0,
+                uid: uniqueUid,
+                inviteCode: uniqueInviteCode,
+                invitedBy: inviteCodeInput || "",
+                isActive: true,
+                isDemo: false,
+                isAdmin: false,
+                totalBetsCount: 0
+            };
+            push(ref(database, 'ygwin_db/users'), newUser);
+            alert("Registration Successful! Please login.");
+            switchScreen('loginScreen');
+        });
+    }
+
+    window.loginUser = function() {
+        let phoneInput = document.getElementById('logPhone').value.trim();
+        let pass = document.getElementById('logPass').value.trim();
+
+        get(ref(database, 'ygwin_db/users')).then((snapshot) => {
+            let usersObj = snapshot.val() || {};
+            let targetUserKey = null;
+            let targetUser = null;
+            for(let k in usersObj) {
+                if(usersObj[k].phone === phoneInput) {
+                    targetUserKey = k;
+                    targetUser = usersObj[k];
+                    break;
+                }
+            }
+
+            if(!targetUser) { alert("Number not registered!"); return; }
+            if(!targetUser.isActive) { alert("Your account has been deactivated by Admin."); return; }
+            if(targetUser.pass !== pass) { alert("Incorrect password!"); return; }
+
+            currentUser = { ...targetUser, dbKey: targetUserKey };
+            if(!currentUser.inviteCode) {
+                currentUser.inviteCode = "YG" + currentUser.uid;
+                update(ref(database, `ygwin_db/users/${targetUserKey}`), { inviteCode: currentUser.inviteCode });
+            }
+            localStorage.removeItem('ygwin_pre_admin_user');
+            localStorage.setItem('ygwin_current_user', JSON.stringify(currentUser));
+            switchScreen('homeScreen');
+        });
+    }
+
+    let logoTapCount = 0;
+    let logoTapTimer = null;
+    window.handleLogoClick = function() {
+        logoTapCount++;
+        if(logoTapCount === 5) {
+            logoTapCount = 0;
+            let passInput = prompt("Enter Admin Password:");
+            
+            get(ref(database, 'ygwin_db/adminPasses')).then((snapshot) => {
+                let passes = snapshot.val() || { "Admin": "Myselfyg26" };
+                let isGranted = false;
+                for(let uName in passes) {
+                    if(passes[uName] === passInput) {
+                        isGranted = true;
+                        break;
+                    }
+                }
+
+                if(isGranted) {
+                    showAccessPopup(true);
+                    if (currentUser && !currentUser.isAdmin) {
+                        localStorage.setItem('ygwin_pre_admin_user', JSON.stringify(currentUser));
+                    }
+                    currentUser = { phone: "Admin", isAdmin: true, uid: "ADMIN" };
+                    localStorage.setItem('ygwin_current_user', JSON.stringify(currentUser));
+                    setTimeout(() => { switchScreen('adminScreen'); }, 1200);
+                } else {
+                    showAccessPopup(false);
+                }
+            });
+        }
+        clearTimeout(logoTapTimer);
+        logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
+    }
+
+    function showAccessPopup(isGranted) {
+        let popup = document.getElementById('gameResultPopup');
+        let box = document.getElementById('resultBoxContent');
+        if(!popup || !box) return;
+
+        if(isGranted) {
+            box.className = "result-box winner access-popup";
+            box.innerText = "Access Granted ✅";
+        } else {
+            box.className = "result-box lose access-popup";
+            box.innerText = "Access Denied ❌";
+        }
+
+        popup.classList.remove('hidden');
+        setTimeout(() => { popup.classList.add('hidden'); }, 2000);
+    }
+
+    window.confirmLogout = function() {
+        if(confirm("Are you sure you want to logout?")) {
+            logout();
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('ygwin_current_user');
+        localStorage.removeItem('ygwin_current_screen');
+        localStorage.removeItem('ygwin_pre_admin_user');
+        currentUser = null;
+        switchScreen('loginScreen');
+    }
+
+    window.adminExitToHome = function() {
+        let preAdmin = JSON.parse(localStorage.getItem('ygwin_pre_admin_user'));
+        if (preAdmin) {
+            currentUser = preAdmin;
+            localStorage.setItem('ygwin_current_user', JSON.stringify(currentUser));
+            localStorage.removeItem('ygwin_pre_admin_user');
+        } else {
+            currentUser = { phone: "DemoUser", balance: 0, uid: "123456" };
+        }
+        switchScreen('homeScreen');
+    }
+
+    let lastEvaluatedSecond = -1;
+
+    function checkAndProcessGlobalRounds() {
+        let now = new Date();
+        let utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        let istDate = new Date(utc + (3600000 * 5.5));
+
+        let seconds = istDate.getSeconds();
+        remainingSeconds = 60 - seconds;
+        let minutes = istDate.getMinutes();
+        let totalMinutes = istDate.getHours() * 60 + minutes;
+
+        let yyyyMMdd = istDate.toISOString().slice(0,10).replace(/-/g,'');
+        let currentPeriodNumber = yyyyMMdd + "1000" + (10001 + totalMinutes - 330);
+
+        calculatedPeriodStr = currentPeriodNumber;
+
+        if(document.getElementById('periodNumber')) {
+            document.getElementById('periodNumber').innerText = calculatedPeriodStr;
+            let formattedSec = remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds;
+            document.getElementById('timerClock').innerText = `00:${formattedSec}`;
+        }
+
+        if(document.getElementById('admTimerDisplay')) {
+            let formattedSec = remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds;
+            document.getElementById('admTimerDisplay').innerText = `00:${formattedSec}`;
+        }
+
+        // Strict 15 Seconds Timer Lock Check
+        if (remainingSeconds <= 15) {
+            let betModalEl = document.getElementById('betModal');
+            if (betModalEl && !betModalEl.classList.contains('hidden')) {
+                closeModals();
+                alert("Betting is closed for this round! (15 seconds remaining)");
+            }
+        }
+
+        renderHistoryTable();
+
+        if(currentUser && currentUser.isAdmin && document.getElementById('adminScreen') && !document.getElementById('adminScreen').classList.contains('hidden')) {
+            renderAdminPanel();
+        }
+
+        if (seconds === 0 && lastEvaluatedSecond !== 0) {
+            let prevTotalMinutes = totalMinutes - 1;
+            if (prevTotalMinutes >= 330) {
+                let prevPeriodStr = yyyyMMdd + "1000" + (10001 + prevTotalMinutes - 330);
+                evaluateRoundForPeriod(prevPeriodStr);
+            }
+            lastEvaluatedSecond = 0;
+        } else if (seconds !== 0) {
+            lastEvaluatedSecond = seconds;
+        }
+    }
+
+    function evaluateMissedPeriodsBackfill() {
+        let now = new Date();
+        let utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        let istDate = new Date(utc + (3600000 * 5.5));
+        let minutes = istDate.getMinutes();
+        let totalMinutes = istDate.getHours() * 60 + minutes;
+        let yyyyMMdd = istDate.toISOString().slice(0,10).replace(/-/g,'');
+
+        for (let m = totalMinutes - 5; m < totalMinutes; m++) {
+            if (m >= 330) {
+                let pStr = yyyyMMdd + "1000" + (10001 + m - 330);
+                let exists = false;
+                if (db.history) {
+                    for (let hk in db.history) {
+                        if (db.history[hk].period === pStr) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+                if (!exists) {
+                    evaluateRoundForPeriod(pStr);
+                }
+            }
+        }
+    }
+
+    window.openBetModal = function(choice) {
+        if(!currentUser || currentUser.isAdmin) return;
+        if (remainingSeconds <= 15) {
+            alert("Betting is closed! Remaining time is 15 seconds or less.");
+            return;
+        }
+
+        pendingBetChoice = choice;
+        baseBetUnit = 1;
+        betMultiplier = 1;
+        document.getElementById('betModalChoice').innerText = choice;
+        document.getElementById('betQtyInput').value = 1;
+        document.querySelectorAll('.timer-tabs-grid .timer-tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('mul_1').classList.add('active');
+        updateTotalBetAmt();
+        document.getElementById('betModal').classList.remove('hidden');
+    }
+
+    window.setBetAmt = function(amt) {
+        baseBetUnit = amt;
+        updateTotalBetAmt();
+    }
+
+    window.adjustQty = function(change) {
+        let qInput = document.getElementById('betQtyInput');
+        let val = parseInt(qInput.value) || 1;
+        val += change;
+        if(val < 1) val = 1;
+        qInput.value = val;
+        updateTotalBetAmt();
+    }
+
+    window.setMultiplier = function(mul) {
+        betMultiplier = mul;
+        document.querySelectorAll('[id^="mul_"]').forEach(b => b.classList.remove('active'));
+        document.getElementById(`mul_${mul}`).classList.add('active');
+        updateTotalBetAmt();
+    }
+
+    window.updateTotalBetAmt = function() {
+        let qty = parseInt(document.getElementById('betQtyInput').value) || 1;
+        let total = baseBetUnit * qty * betMultiplier;
+        document.getElementById('totalBetAmtBtn').innerText = `Total amount ₹${total.toFixed(2)}`;
+    }
+
+    window.confirmAndPlaceBet = function() {
+        if (remainingSeconds <= 15) {
+            closeModals();
+            alert("Betting is closed! Time is 15 seconds or less.");
+            return;
+        }
+
+        let qty = parseInt(document.getElementById('betQtyInput').value) || 1;
+        let totalAmount = baseBetUnit * qty * betMultiplier;
+
+        if(isNaN(totalAmount) || totalAmount < 1) { alert("Minimum bet is ₹1"); return; }
+        if(currentUser.balance < totalAmount) {
+            alert("Insufficient balance! Please deposit to play.");
+            closeModals();
+            openDeposit();
+            return;
+        }
+
+        currentUser.balance -= totalAmount;
+        currentUser.totalBetsCount = (currentUser.totalBetsCount || 0) + 1;
+        updateUserBalanceFirebase(currentUser);
+
+        let newBet = {
+            phone: currentUser.phone,
+            uid: currentUser.uid || "",
+            period: calculatedPeriodStr,
+            choice: pendingBetChoice,
+            amount: totalAmount,
+            timestamp: Date.now()
+        };
+        push(ref(database, 'ygwin_db/activeBets'), newBet);
+        alert(`Successfully placed bet of ₹${totalAmount} on ${pendingBetChoice}!`);
+        closeModals();
+    }
+
+    // Round Evaluation Engine with Pure Random (when no bets) and 40% Win / 60% Loss Algorithm (when betting active)
+    function evaluateRoundForPeriod(targetPeriod) {
+        const dbRef = ref(database, 'ygwin_db');
+        runTransaction(dbRef, (currentData) => {
+            if (!currentData) return currentData;
+            if (!currentData.history) currentData.history = {};
+
+            let alreadyExists = false;
+            for(let k in currentData.history) {
+                if(currentData.history[k].period === targetPeriod) {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+            if (alreadyExists) return;
+
+            let algoMode = currentData.control && currentData.control.algorithm ? currentData.control.algorithm : "";
+            let forcedNum = currentData.control && currentData.control.forcedNumber !== undefined ? currentData.control.forcedNumber : null;
+            
+            let winningNumber = 0;
+            if (forcedNum !== null && forcedNum !== undefined && forcedNum >= 0 && forcedNum <= 9) {
+                winningNumber = Number(forcedNum);
+                currentData.control.forcedNumber = null;
+            } else {
+                let activeBetsObj = currentData.activeBets || {};
+                let currentPeriodBets = [];
+                for(let bk in activeBetsObj) {
+                    if(activeBetsObj[bk].period === targetPeriod) {
+                        currentPeriodBets.push(activeBetsObj[bk]);
+                    }
+                }
+
+                if (currentPeriodBets.length === 0 || !algoMode) {
+                    winningNumber = Math.floor(Math.random() * 10);
+                } else {
+                    if (algoMode === "least_pool_wins") {
+                        winningNumber = Math.floor(Math.random() * 10);
+                    } else {
+                        let isRiggedWin = Math.random() < 0.40;
+                        if (isRiggedWin && currentPeriodBets.length > 0) {
+                            let sampleBet = currentPeriodBets[0];
+                            let choice = String(sampleBet.choice);
+                            if (choice === "Big") winningNumber = Math.floor(Math.random() * 5) + 5; // 5-9
+                            else if (choice === "Small") winningNumber = Math.floor(Math.random() * 5); // 0-4
+                            else if (choice === "Green") {
+                                let greenNums = [1, 3, 7, 9, 5];
+                                winningNumber = greenNums[Math.floor(Math.random() * greenNums.length)];
+                            } else if (choice === "Red") {
+                                let redNums = [2, 4, 6, 8, 0];
+                                winningNumber = redNums[Math.floor(Math.random() * redNums.length)];
+                            } else if (choice === "Violet") {
+                                winningNumber = Math.random() < 0.5 ? 0 : 5;
+                            } else {
+                                winningNumber = parseInt(choice) || Math.floor(Math.random() * 10);
+                            }
+                        } else {
+                            winningNumber = Math.floor(Math.random() * 10);
+                        }
+                    }
+                }
+            }
+
+            let bigSmall = winningNumber >= 5 ? "Big" : "Small";
+            
+            let colorType = ""; 
+            if(winningNumber === 0) colorType = "red-violet";
+            else if(winningNumber === 5) colorType = "green-violet";
+            else if([2,4,6,8].includes(winningNumber)) colorType = "red";
+            else colorType = "green";
+
+            const newHistoryKey = push(ref(database, 'ygwin_db/history')).key;
+            currentData.history[newHistoryKey] = { 
+                period: targetPeriod, 
+                number: winningNumber, 
+                bigSmall: bigSmall, 
+                colorType: colorType 
+            };
+
+            let usersObj = currentData.users || {};
+            if (!currentData.userResults) currentData.userResults = {};
+            if (!currentData.betsHistory) currentData.betsHistory = {};
+
+            let activeBetsObj = currentData.activeBets || {};
+            for(let betKey in activeBetsObj) {
+                let b = activeBetsObj[betKey];
+                if(b.period === targetPeriod) {
+                    let isWin = false;
+                    let totalReturnAmt = 0;
+                    let betAmt = Number(b.amount);
+
+                    let choice = String(b.choice);
+                    let choiceDotType = 'green';
+                    if(choice === "Big" || choice === "Small") {
+                        isWin = (choice === bigSmall);
+                        if(isWin) totalReturnAmt = betAmt * 1.96; // 96% profit return (Total Return)
+                        choiceDotType = choice === "Big" ? 'orange' : 'blue';
+                    } else if(choice === "Green") {
+                        isWin = (colorType === "green" || colorType === "green-violet");
+                        if(isWin) totalReturnAmt = betAmt * 1.96;
+                        choiceDotType = 'green';
+                    } else if(choice === "Red") {
+                        isWin = (colorType === "red" || colorType === "red-violet");
+                        if(isWin) totalReturnAmt = betAmt * 1.96;
+                        choiceDotType = 'red';
+                    } else if(choice === "Violet") {
+                        isWin = (colorType === "red-violet" || colorType === "green-violet");
+                        if(isWin) totalReturnAmt = betAmt * 4.42; // Violet total return 4.42x
+                        choiceDotType = 'violet';
+                    } else {
+                        let betNum = parseInt(choice);
+                        isWin = (betNum === winningNumber);
+                        if(isWin) totalReturnAmt = betAmt * 8.82; // Number total return 8.82x
+                        choiceDotType = (betNum === 0 || betNum === 5) ? 'violet' : ([2,4,6,8].includes(betNum) ? 'red' : 'green');
+                    }
+
+                    let displayReturnAmt = 0;
+                    if(isWin) {
+                        displayReturnAmt = totalReturnAmt;
+                        for(let uKey in usersObj) {
+                            if(usersObj[uKey].phone === b.phone) {
+                                usersObj[uKey].balance = Number(usersObj[uKey].balance) + totalReturnAmt;
+                                break;
+                            }
+                        }
+                    } else {
+                        displayReturnAmt = -betAmt;
+                    }
+
+                    const betHistKey = push(ref(database, 'ygwin_db/betsHistory')).key;
+                    currentData.betsHistory[betHistKey] = {
+                        phone: b.phone,
+                        uid: b.uid || "",
+                        period: targetPeriod,
+                        choice: b.choice,
+                        choiceDot: choiceDotType,
+                        amount: betAmt,
+                        resultNumber: winningNumber,
+                        resultBigSmall: bigSmall,
+                        resultColorType: colorType,
+                        status: isWin ? 'Win' : 'Loss',
+                        profitLoss: displayReturnAmt,
+                        timestamp: Date.now()
+                    };
+
+                    const resKey = push(ref(database, 'ygwin_db/userResults')).key;
+                    currentData.userResults[resKey] = {
+                        phone: b.phone,
+                        period: targetPeriod,
+                        isWin: isWin,
+                        timestamp: Date.now()
+                    };
+                }
+                delete activeBetsObj[betKey];
+            }
+
+            currentData.activeBets = activeBetsObj;
+            currentData.users = usersObj;
+            return currentData;
+        }).catch((error) => {
+            console.error("Transaction failed: ", error);
+        });
+    }
+
+    function showResultPopup(isWin) {
+        let popup = document.getElementById('gameResultPopup');
+        let box = document.getElementById('resultBoxContent');
+        if(!popup || !box) return;
+
+        if(isWin) {
+            box.className = "result-box winner";
+            box.innerText = "Winner! 🎉";
+        } else {
+            box.className = "result-box lose";
+            box.innerText = "Lose! ❌";
+        }
+
+        popup.classList.remove('hidden');
+        setTimeout(() => {
+            popup.classList.add('hidden');
+        }, 3000);
+    }
+
+    window.clearMyBetHistory = function() {
+        if(confirm("Are you sure you want to clear your entire bet history?")) {
+            if(db.betsHistory && currentUser) {
+                let updates = {};
+                for(let k in db.betsHistory) {
+                    if(db.betsHistory[k].phone === currentUser.phone) {
+                        updates[`ygwin_db/betsHistory/${k}`] = null;
+                    }
+                }
+                update(ref(database), updates).then(() => {
+                    alert("Bet history cleared successfully!");
+                    renderHistoryTable();
+                });
+            }
+        }
+    }
+
+    function renderHistoryTable() {
+        let tbody = document.getElementById('historyBody');
+        let theadTr = document.getElementById('histTableHeader');
+        let clearHistContainer = document.getElementById('clearMyHistContainer');
+        if(!tbody || !theadTr) return;
+        tbody.innerHTML = "";
+        if(clearHistContainer) clearHistContainer.classList.add('hidden');
+
+        let histList = [];
+        if(db.history) {
+            for(let k in db.history) {
+                histList.push(db.history[k]);
+            }
+        }
+        histList.sort((a, b) => b.period.localeCompare(a.period));
+
+        if(currentHistTab === 'game') {
+            theadTr.innerHTML = `<th>Period</th><th>Number</th><th>Big Small</th><th>Color</th>`;
+            let filtered = histList.filter(h => h.period !== calculatedPeriodStr).slice(0, 10);
+            filtered.forEach(h => {
+                let tr = document.createElement('tr');
+                let numColor = (h.number === 0 || h.number === 5) ? '#8b5cf6' : ([2,4,6,8].includes(h.number) ? '#ef4444' : '#10b981');
+                
+                let dotHtml = '';
+                if(h.colorType === 'red') dotHtml = `<div class="dot-container"><span class="history-dot dot-red"></span></div>`;
+                else if(h.colorType === 'green') dotHtml = `<div class="dot-container"><span class="history-dot dot-green"></span></div>`;
+                else if(h.colorType === 'red-violet') dotHtml = `<div class="dot-container"><span class="history-dot dot-red"></span><span class="history-dot dot-violet"></span></div>`;
+                else if(h.colorType === 'green-violet') dotHtml = `<div class="dot-container"><span class="history-dot dot-green"></span><span class="history-dot dot-violet"></span></div>`;
+
+                tr.innerHTML = `
+                    <td style="font-size:10px; font-weight:700;">${h.period}</td>
+                    <td><span style="font-size:14px; font-weight:800; color:${numColor};">${h.number}</span></td>
+                    <td style="font-weight:700;">${h.bigSmall}</td>
+                    <td>${dotHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } else if(currentHistTab === 'chart') {
+            theadTr.innerHTML = `<th>Period</th><th>Trend Analysis</th>`;
+            let filtered = histList.filter(h => h.period !== calculatedPeriodStr).slice(0, 10);
+            filtered.forEach(h => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td style="font-size:10px; font-weight:700;">${h.period}</td><td style="color:#3b82f6; font-weight:bold;">Trend Chart Visual [Period ${h.number}]</td>`;
+                tbody.appendChild(tr);
+            });
+        } else if(currentHistTab === 'my') {
+            theadTr.innerHTML = `<th>Period</th><th>Choice</th><th>Bet</th><th>Status</th>`;
+            let userBets = [];
+            if(db.betsHistory && currentUser) {
+                for(let k in db.betsHistory) {
+                    if(db.betsHistory[k].phone === currentUser.phone) {
+                        userBets.push(db.betsHistory[k]);
+                    }
+                }
+            }
+            userBets.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            userBets.slice(0, 10).forEach(bh => {
+                let tr = document.createElement('tr');
+                let color = bh.status === 'Win' ? '#10b981' : '#ef4444';
+                let plText = bh.status === 'Win' ? `+₹${bh.profitLoss.toFixed(2)}` : `-₹${bh.amount}`;
+                
+                let choiceDisplayHtml = bh.choice;
+                let dotClass = bh.choiceDot || 'green';
+                if(dotClass === 'green') {
+                    choiceDisplayHtml = `<span style="display:inline-block; width:10px; height:10px; background:#10b981; border-radius:50%; vertical-align:middle;" title="${bh.choice}"></span> <span style="vertical-align:middle;">${bh.choice}</span>`;
+                } else if(dotClass === 'red') {
+                    choiceDisplayHtml = `<span style="display:inline-block; width:10px; height:10px; background:#ef4444; border-radius:50%; vertical-align:middle;" title="${bh.choice}"></span> <span style="vertical-align:middle;">${bh.choice}</span>`;
+                } else if(dotClass === 'violet') {
+                    choiceDisplayHtml = `<span style="display:inline-block; width:10px; height:10px; background:#8b5cf6; border-radius:50%; vertical-align:middle;" title="${bh.choice}"></span> <span style="vertical-align:middle;">${bh.choice}</span>`;
+                } else if(dotClass === 'orange') {
+                    choiceDisplayHtml = `<span style="display:inline-block; width:10px; height:10px; background:#f59e0b; border-radius:50%; vertical-align:middle;" title="${bh.choice}"></span> <span style="vertical-align:middle;">${bh.choice}</span>`;
+                } else if(dotClass === 'blue') {
+                    choiceDisplayHtml = `<span style="display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:50%; vertical-align:middle;" title="${bh.choice}"></span> <span style="vertical-align:middle;">${bh.choice}</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td style="font-size:10px; font-weight:700;"><b>${bh.period}</b></td>
+                    <td>${choiceDisplayHtml}</td>
+                    <td>₹${bh.amount}</td>
+                    <td><span style="color:${color}; font-weight:bold;">${plText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            if(userBets.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#94a3b8;">No bet history found.</td></tr>`;
+            } else {
+                if(clearHistContainer) clearHistContainer.classList.remove('hidden');
+            }
+        }
+    }
+
+    window.updateUserBalanceFirebase = function(updatedUser) {
+        currentUser = updatedUser;
+        localStorage.setItem('ygwin_current_user', JSON.stringify(currentUser));
+        if(document.getElementById('walletBalance')) {
+            document.getElementById('walletBalance').innerText = Number(currentUser.balance).toFixed(2);
+            document.getElementById('walletScreenBalance').innerText = Number(currentUser.balance).toFixed(2);
+        }
+
+        if(updatedUser.dbKey) {
+            update(ref(database, `ygwin_db/users/${updatedUser.dbKey}`), { balance: updatedUser.balance, totalBetsCount: updatedUser.totalBetsCount || 0 });
+        } else {
+            get(ref(database, 'ygwin_db/users')).then((snapshot) => {
+                let usersObj = snapshot.val() || {};
+                for(let k in usersObj) {
+                    if(usersObj[k].phone === updatedUser.phone) {
+                        currentUser.dbKey = k;
+                        update(ref(database, `ygwin_db/users/${k}`), { balance: updatedUser.balance, totalBetsCount: updatedUser.totalBetsCount || 0 });
+                        break;
+                    }
+                }
+            });
+        }
+    }
+
+    window.openDeposit = function() {
+        if (currentUser && currentUser.isDemo) {
+            let demoAmt = prompt("Demo Account: Enter deposit amount to add instantly:", "1000");
+            if (demoAmt !== null) {
+                let amtNum = parseFloat(demoAmt);
+                if (!isNaN(amtNum) && amtNum > 0) {
+                    currentUser.balance += amtNum;
+                    updateUserBalanceFirebase(currentUser);
+                    push(ref(database, 'ygwin_db/deposits'), {
+                        phone: currentUser.phone,
+                        uid: currentUser.uid,
+                        amount: amtNum,
+                        utr: "DEMO" + Math.floor(100000000 + Math.random() * 900000000),
+                        status: 'Approved',
+                        adminMsg: 'Demo Instant Deposit',
+                        timestamp: Date.now()
+                    });
+                    alert(`Demo Deposit of ₹${amtNum} successful!`);
+                }
+            }
+            return;
+        }
+
+        get(ref(database, 'ygwin_db/qr')).then((snapshot) => {
+            let qrVal = snapshot.val() || db.qr;
+            if(qrVal) {
+                document.getElementById('adminQrImg').src = qrVal;
+            }
+        });
+        document.getElementById('depositModal').classList.remove('hidden');
+    }
+
+    window.submitDeposit = function() {
+        let amount = parseFloat(document.getElementById('depAmount').value);
+        let utr = document.getElementById('depUtr').value.trim();
+
+        if(isNaN(amount) || amount < 10) { alert("Minimum deposit is ₹10"); return; }
+        if(utr.length !== 12) { alert("Invalid UTR! Must be exactly 12 digits."); return; }
+
+        let newDep = {
+            phone: currentUser.phone,
+            uid: currentUser.uid,
+            amount: amount,
+            utr: utr,
+            status: 'Pending',
+            timestamp: Date.now()
+        };
+        push(ref(database, 'ygwin_db/deposits'), newDep);
+        alert("Deposit submitted successfully!");
+        closeModals();
+        openDepositHistory();
+    }
+
+    window.openWithdrawModal = function() {
+        closeModals();
+        tempWithdrawQrBase64 = "";
+        document.getElementById('witUpiName').value = "";
+        document.getElementById('witUpiId').value = "";
+        document.getElementById('witUpiAmount').value = "";
+        document.getElementById('witQrFile').value = "";
+        document.getElementById('withdrawModal').classList.remove('hidden');
+    }
+
+    window.handleUserWitQrUpload = function(event) {
+        let file = event.target.files[0];
+        if(file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                tempWithdrawQrBase64 = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    window.submitWithdrawalUPI = function() {
+        let name = document.getElementById('witUpiName').value.trim();
+        let upi = document.getElementById('witUpiId').value.trim();
+        let amount = parseFloat(document.getElementById('witUpiAmount').value);
+
+        if(!name || !upi || isNaN(amount) || amount <= 0 || !tempWithdrawQrBase64) {
+            alert("Fill Full Details");
+            return;
+        }
+
+        if(amount > currentUser.balance) { 
+            alert("Insufficient balance!"); 
+            return; 
+        }
+
+        currentUser.balance -= amount;
+        updateUserBalanceFirebase(currentUser);
+
+        let newWit = {
+            phone: currentUser.phone,
+            uid: currentUser.uid,
+            method: 'UPI',
+            name: name,
+            upi: upi,
+            amount: amount,
+            qrImage: tempWithdrawQrBase64,
+            status: 'Pending',
+            timestamp: Date.now()
+        };
+        push(ref(database, 'ygwin_db/withdraws'), newWit);
+        alert("Withdrawal request submitted successfully!");
+        closeModals();
+        openWithdrawHistory();
+    }
+
+    window.openDepositHistory = function() {
+        switchScreen('walletScreen');
+    }
+
+    window.openWithdrawHistory = function() {
+        switchScreen('walletScreen');
+    }
+
+    window.renderWalletHistories = function() {
+        let depHtml = "";
+        let foundDep = false;
+        if(db.deposits) {
+            for(let k in db.deposits) {
+                let d = db.deposits[k];
+                if(d.phone === currentUser.phone && !d.deleted) {
+                    foundDep = true;
+                    let color = d.status === 'Approved' ? '#10b981' : (d.status === 'Rejected' ? '#ef4444' : '#d97706');
+                    let statusMsgText = d.adminMsg ? ` (${d.adminMsg})` : '';
+                    let dateStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : '';
+                    depHtml += `<div style="background:#1e293b; padding:8px 10px; margin-bottom:6px; border-radius:8px; border:1px solid #334155; font-size:12px;">
+                        Amount: ₹${d.amount} | UTR: ${d.utr}<br>Date: ${dateStr}<br>Status: <span style="color:${color}; font-weight:bold;">${d.status}${statusMsgText}</span>
+                    </div>`;
+                }
+            }
+        }
+        if(!foundDep) depHtml = "No deposit history found.";
+        document.getElementById('walletDepHistory').innerHTML = depHtml;
+
+        let witHtml = "";
+        let foundWit = false;
+        if(db.withdraws) {
+            for(let k in db.withdraws) {
+                let w = db.withdraws[k];
+                if(w.phone === currentUser.phone && !w.deleted) {
+                    foundWit = true;
+                    let color = w.status === 'Approved' ? '#10b981' : (w.status === 'Rejected' ? '#ef4444' : '#d97706');
+                    let statusMsgText = w.adminMsg ? ` (${w.adminMsg})` : '';
+                    let dateStr = w.timestamp ? new Date(w.timestamp).toLocaleString() : '';
+                    witHtml += `<div style="background:#1e293b; padding:8px 10px; margin-bottom:6px; border-radius:8px; border:1px solid #334155; font-size:12px;">
+                        Method: <b>UPI</b> | Amount: ₹${w.amount}<br>Name: ${w.name} | UPI: ${w.upi}<br>Date: ${dateStr}<br>Status: <span style="color:${color}; font-weight:bold;">${w.status}${statusMsgText}</span>
+                    </div>`;
+                }
+            }
+        }
+        if(!foundWit) witHtml = "No withdraw history found.";
+        document.getElementById('walletWitHistory').innerHTML = witHtml;
+    }
+
+    window.clearCurrentHistory = function() {
+        if(confirm("Are you sure you want to clear your history?")) {
+            if(db.deposits) {
+                for(let k in db.deposits) {
+                    if(db.deposits[k].phone === currentUser.phone) {
+                        update(ref(database, `ygwin_db/deposits/${k}`), { deleted: true });
+                    }
+                }
+            }
+            if(db.withdraws) {
+                for(let k in db.withdraws) {
+                    if(db.withdraws[k].phone === currentUser.phone) {
+                        update(ref(database, `ygwin_db/withdraws/${k}`), { deleted: true });
+                    }
+                }
+            }
+            renderWalletHistories();
+        }
+    }
+
+    window.closeModals = function() {
+        document.querySelectorAll('.modal, .bet-modal-overlay').forEach(m => m.classList.add('hidden'));
+    }
+
+    // ADMIN DRAWER & TAB NAVIGATION
+    window.toggleAdminDrawer = function() {
+        document.getElementById('adminDrawer').classList.toggle('open');
+    }
+
+    window.switchAdminTab = function(tabName) {
+        document.getElementById('adminDrawer').classList.remove('open');
+        document.querySelectorAll('.adm-tab-pane').forEach(el => el.classList.add('hidden'));
+
+        if(tabName === 'users') document.getElementById('admTabUsers').classList.remove('hidden');
+        if(tabName === 'demoUsers') document.getElementById('admTabDemoUsers').classList.remove('hidden');
+        if(tabName === 'agentWorker') document.getElementById('admTabAgentWorker').classList.remove('hidden');
+        if(tabName === 'agentSalary') document.getElementById('admTabAgentSalary').classList.remove('hidden');
+        if(tabName === 'control') document.getElementById('admTabControl').classList.remove('hidden');
+        if(tabName === 'deposits') document.getElementById('admTabDeposits').classList.remove('hidden');
+        if(tabName === 'withdraws') document.getElementById('admTabWithdraws').classList.remove('hidden');
+        if(tabName === 'depositHistory') document.getElementById('admTabDepositHistory').classList.remove('hidden');
+        if(tabName === 'withdrawHistory') document.getElementById('admTabWithdrawHistory').classList.remove('hidden');
+        if(tabName === 'createAdmin') document.getElementById('admTabCreateAdmin').classList.remove('hidden');
+    }
+
+    window.adminForceNumber = function(num) {
+        set(ref(database, 'ygwin_db/control/forcedNumber'), num).then(() => {
+            alert(`Success! Forced outcome for current period set to number ${num}.`);
+        });
+    }
+
+    window.createNewAdminCred = function() {
+        let uName = document.getElementById('newAdminUser').value.trim();
+        let pass = document.getElementById('newAdminPass').value.trim();
+        if(!uName || !pass) { alert("Enter both username and password!"); return; }
+
+        set(ref(database, `ygwin_db/adminPasses/${uName}`), pass).then(() => {
+            alert(`New admin credential for "${uName}" created successfully!`);
+            document.getElementById('newAdminUser').value = "";
+            document.getElementById('newAdminPass').value = "";
+        });
+    }
+
+    window.createDemoAccountByAdmin = function() {
+        let phone = document.getElementById('demoPhoneInput').value.trim();
+        let pass = document.getElementById('demoPassInput').value.trim();
+        if(!phone || !pass) { alert("Enter phone and password for demo account!"); return; }
+
+        let uniqueUid = Math.floor(100000 + Math.random() * 900000);
+        let uniqueInviteCode = "DEMO" + Math.floor(10000 + Math.random() * 90000);
+
+        let newDemoUser = {
+            phone: phone,
+            pass: pass,
+            balance: 10000,
+            uid: uniqueUid,
+            inviteCode: uniqueInviteCode,
+            invitedBy: "",
+            isActive: true,
+            isDemo: true,
+            isAdmin: false,
+            totalBetsCount: 0
+        };
+
+        push(ref(database, 'ygwin_db/users'), newDemoUser).then(() => {
+            alert(`Demo Account created successfully with phone ${phone}!`);
+            document.getElementById('demoPhoneInput').value = "";
+            document.getElementById('demoPassInput').value = "";
+        });
+    }
+
+    window.makeAgentWorker = function(userKey, phone) {
+        if(confirm(`Are you sure you want to assign user ${phone} as an Agent Worker?`)) {
+            update(ref(database, `ygwin_db/agentWorkers/${userKey}`), { assignedAt: Date.now() }).then(() => {
+                alert(`User ${phone} successfully added to Agent Workers!`);
+                renderAdminPanel();
+            });
+        }
+    }
+
+    window.removeAgentWorker = function(userKey) {
+        if(confirm("Remove user from Agent Workers?")) {
+            remove(ref(database, `ygwin_db/agentWorkers/${userKey}`)).then(() => {
+                alert("Agent worker removed.");
+                renderAdminPanel();
+            });
+        }
+    }
+
+    window.updateUserBalanceByAdmin = function(userKey, currentBal) {
+        let newAmtStr = prompt("Enter new wallet balance for user:", currentBal);
+        if(newAmtStr !== null) {
+            let newAmt = parseFloat(newAmtStr);
+            if(!isNaN(newAmt)) {
+                update(ref(database, `ygwin_db/users/${userKey}`), { balance: newAmt }).then(() => {
+                    alert("User wallet balance updated successfully!");
+                    renderAdminPanel();
+                });
+            } else {
+                alert("Invalid amount!");
+            }
+        }
+    }
+
+    window.creditAgentSalary = function(agentPhone, agentKey, invitedPhone, depositAmt) {
+        let defaultSalary = Number(depositAmt) * 0.05;
+        let salaryInput = prompt(`Edit salary amount manually (Default 5% = ₹${defaultSalary.toFixed(2)}):`, defaultSalary.toFixed(2));
+        if(salaryInput === null) return;
+        let salaryAmt = parseFloat(salaryInput);
+        if(isNaN(salaryAmt) || salaryAmt < 0) { alert("Invalid salary amount!"); return; }
+
+        if(confirm(`Credit salary of ₹${salaryAmt.toFixed(2)} to agent ${agentPhone} for deposit by ${invitedPhone}?`)) {
+            get(ref(database, 'ygwin_db/users')).then((snapshot) => {
+                let usersObj = snapshot.val() || {};
+                let agentUserKey = null;
+                let agentUserObj = null;
+                for(let k in usersObj) {
+                    if(usersObj[k].phone === agentPhone) {
+                        agentUserKey = k;
+                        agentUserObj = usersObj[k];
+                        break;
+                    }
+                }
+
+                if(agentUserObj && agentUserKey) {
+                    let newBal = Number(agentUserObj.balance) + salaryAmt;
+                    update(ref(database, `ygwin_db/users/${agentUserKey}`), { balance: newBal }).then(() => {
+                        push(ref(database, 'ygwin_db/agentSalaryCredits'), {
+                            agentPhone: agentPhone,
+                            invitedPhone: invitedPhone,
+                            depositAmount: depositAmt,
+                            salaryAmount: salaryAmt,
+                            timestamp: Date.now()
+                        });
+                        alert(`Successfully credited ₹${salaryAmt.toFixed(2)} salary to agent ${agentPhone}!`);
+                        renderAdminPanel();
+                    });
+                } else {
+                    alert("Agent user not found.");
+                }
+            });
+        }
+    }
+
+    window.adminClearDepositHistory = function() {
+        if(confirm("Are you sure you want to clear all processed deposit request history?")) {
+            if(db.deposits) {
+                let updates = {};
+                for(let k in db.deposits) {
+                    if(db.deposits[k].status !== 'Pending') {
+                        updates[`ygwin_db/deposits/${k}`] = null;
+                    }
+                }
+                update(ref(database), updates).then(() => {
+                    alert("Deposit history cleared successfully!");
+                    renderAdminPanel();
+                });
+            }
+        }
+    }
+
+    window.adminClearWithdrawHistory = function() {
+        if(confirm("Are you sure you want to clear all processed withdrawal request history?")) {
+            if(db.withdraws) {
+                let updates = {};
+                for(let k in db.withdraws) {
+                    if(db.withdraws[k].status !== 'Pending') {
+                        updates[`ygwin_db/withdraws/${k}`] = null;
+                    }
+                }
+                update(ref(database), updates).then(() => {
+                    alert("Withdrawal history cleared successfully!");
+                    renderAdminPanel();
+                });
+            }
+        }
+    }
+
+    function renderAdminPanel() {
+        let userCount = 0;
+        let demoCount = 0;
+        if(db.users) {
+            for(let k in db.users) {
+                if(db.users[k].isDemo) demoCount++;
+                else userCount++;
+            }
+        }
+
+        document.getElementById('admTotalRealUsers').innerText = userCount;
+        document.getElementById('admCurrentPeriod').innerText = calculatedPeriodStr || "--";
+        if(document.getElementById('admLivePeriodTitle')) {
+            document.getElementById('admLivePeriodTitle').innerText = calculatedPeriodStr || "--";
+        }
+
+        if(db.control && db.control.algorithm !== undefined) {
+            let selectEl = document.getElementById('admForceOutcome');
+            if(selectEl && document.activeElement !== selectEl) {
+                selectEl.value = db.control.algorithm;
+            }
+        }
+
+        let liveBetsSummaryEl = document.getElementById('admLiveBetsSummary');
+        if(liveBetsSummaryEl) {
+            let currentBets = [];
+            if(db.activeBets) {
+                for(let bk in db.activeBets) {
+                    let b = db.activeBets[bk];
+                    if(b.period === calculatedPeriodStr) {
+                        currentBets.push(b);
+                    }
+                }
+            }
+
+            if(currentBets.length > 0) {
+                let choiceTotals = {};
+                let userBreakdownHtml = "";
+                currentBets.forEach(b => {
+                    let ch = b.choice;
+                    choiceTotals[ch] = (choiceTotals[ch] || 0) + Number(b.amount);
+                    userBreakdownHtml += `<div style="padding:4px 0; border-bottom:1px solid #f1f5f9;">User: <b>${b.phone}</b> (UID: <b>${b.uid || 'N/A'}</b>) bet <b>₹${b.amount}</b> on <span style="color:#2563eb; font-weight:bold;">${b.choice}</span></div>`;
+                });
+
+                let totalsHtml = `<div style="margin-bottom:6px; font-weight:bold; color:#0f172a;">Pool Totals:</div><div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">`;
+                for(let ch in choiceTotals) {
+                    totalsHtml += `<span style="background:#e0f2fe; color:#0369a1; padding:3px 6px; border-radius:4px; font-weight:bold;">${ch}: ₹${choiceTotals[ch]}</span>`;
+                }
+                totalsHtml += `</div><div style="font-weight:bold; color:#0f172a; margin-bottom:4px;">Individual Bets:</div>`;
+                liveBetsSummaryEl.innerHTML = totalsHtml + userBreakdownHtml;
+            } else {
+                liveBetsSummaryEl.innerHTML = `<span style="color:#64748b;">No active bets placed for the current period yet.</span>`;
+            }
+        }
+
+        let qrStatusText = document.getElementById('admQrStatusText');
+        let qrPreviewContainer = document.getElementById('admQrPreviewContainer');
+        let uploadedQrPreview = document.getElementById('admUploadedQrPreview');
+        if (db.qr) {
+            qrStatusText.innerText = "QR Code Currently Uploaded & Active ✅";
+            qrStatusText.style.color = "#10b981";
+            uploadedQrPreview.src = db.qr;
+            qrPreviewContainer.classList.remove('hidden');
+        } else {
+            qrStatusText.innerText = "No QR Code Uploaded ❌";
+            qrStatusText.style.color = "#ef4444";
+            qrPreviewContainer.classList.add('hidden');
+        }
+
+        let last10Html = "";
+        let histList = [];
+        if(db.history) {
+            for(let k in db.history) {
+                histList.push(db.history[k]);
+            }
+        }
+        histList.sort((a, b) => b.period.localeCompare(a.period));
+        histList.slice(0, 10).forEach(h => {
+            last10Html += `<div style="background:#f1f5f9; padding:5px 8px; margin-bottom:3px; border-radius:6px; border:1px solid #cbd5e1;">Period: <b>${h.period}</b> | Number: <b>${h.number}</b> (${h.bigSmall})</div>`;
+        });
+        document.getElementById('admLast10Results').innerHTML = last10Html || "No results recorded yet.";
+
+        let searchInputEl = document.getElementById('admUserSearchUid');
+        let searchUidVal = searchInputEl ? searchInputEl.value.trim().toLowerCase() : "";
+
+        let usrHtml = "";
+        let demoHtml = "";
+        if(db.users) {
+            let usersArray = [];
+            for(let k in db.users) {
+                usersArray.push({ key: k, ...db.users[k] });
+            }
+
+            if(searchUidVal) {
+                usersArray.sort((a, b) => {
+                    let aMatch = String(a.uid).toLowerCase().includes(searchUidVal) || String(a.inviteCode || '').toLowerCase().includes(searchUidVal);
+                    let bMatch = String(b.uid).toLowerCase().includes(searchUidVal) || String(b.inviteCode || '').toLowerCase().includes(searchUidVal);
+                    if(aMatch && !bMatch) return -1;
+                    if(!aMatch && bMatch) return 1;
+                    return 0;
+                });
+            }
+
+            usersArray.forEach(u => {
+                let isMatch = searchUidVal && (String(u.uid).toLowerCase().includes(searchUidVal) || String(u.inviteCode || '').toLowerCase().includes(searchUidVal));
+                let bgStyle = isMatch ? "background:#e0f2fe; border:1px solid #0284c7;" : "background:#ffffff; border:1px solid #cbd5e1;";
+
+                let userCardMarkup = `<div style="display:flex; justify-content:space-between; align-items:center; ${bgStyle} padding:7px 8px; margin-bottom:5px; border-radius:6px; font-size:11px;">
+                    <div>
+                        <strong style="color:#0f172a; font-size:12px;">${u.phone}</strong> (₹${Number(u.balance).toFixed(2)}) <button style="background:#2563eb; color:#fff; border:none; padding:2px 5px; border-radius:4px; font-size:9px; cursor:pointer;" onclick="updateUserBalanceByAdmin('${u.key}', ${u.balance})">Edit Bal</button><br>
+                        <span style="color:#475569; font-size:10px;">UID: <b style="color:#2563eb;">${u.uid || 'N/A'}</b> | Code: <b style="color:#10b981;">${u.inviteCode || 'N/A'}</b> | Invited By: <b style="color:#d97706;">${u.invitedBy || 'None'}</b></span>
+                    </div>
+                    <div style="display:flex; gap:3px; margin-left: 4px; align-items:center;">
+                        ${!u.isDemo ? `<button class="auth-btn" style="padding:3px 6px; margin:0; background:#0284c7; font-size:10px; width:auto;" onclick="makeAgentWorker('${u.key}', '${u.phone}')">Make Agent</button>` : ''}
+                        <button class="auth-btn" style="padding:3px 6px; margin:0; background:${u.isActive?'#d97706':'#10b981'}; font-size:10px; width:auto;" onclick="toggleUserStatus('${u.key}')">${u.isActive?'Deactivate':'Activate'}</button>
+                        <button class="auth-btn" style="padding:3px 6px; margin:0; background:#ef4444; border:none; border-radius:5px; font-size:10px; font-weight:bold; cursor:pointer; width:auto;" onclick="deleteUserByAdmin('${u.key}', '${u.phone}')">Delete</button>
+                    </div>
+                </div>`;
+
+                if(u.isDemo) {
+                    demoHtml += userCardMarkup;
+                } else {
+                    usrHtml += userCardMarkup;
+                }
+            });
+        }
+        document.getElementById('admUserList').innerHTML = usrHtml || "No real users registered yet.";
+        document.getElementById('admDemoUserList').innerHTML = demoHtml || "No demo accounts created yet.";
+
+        let agentWorkerHtml = "";
+        if(db.agentWorkers && db.users) {
+            let inviteCodeToAgent = {};
+            for(let aKey in db.agentWorkers) {
+                let agUser = db.users[aKey];
+                if(agUser && agUser.inviteCode) {
+                    inviteCodeToAgent[agUser.inviteCode] = agUser.phone;
+                }
+            }
+
+            // Calculate stats per agent
+            let agentStats = {};
+            for(let aKey in db.agentWorkers) {
+                let agUser = db.users[aKey];
+                if(agUser) {
+                    agentStats[agUser.inviteCode] = { phone: agUser.phone, inviteCode: agUser.inviteCode, invitedCount: 0, totalDeposit: 0 };
+                }
+            }
+
+            for(let uKey in db.users) {
+                let usr = db.users[uKey];
+                if(usr.invitedBy && agentStats[usr.invitedBy]) {
+                    agentStats[usr.invitedBy].invitedCount++;
+                    if(db.deposits) {
+                        for(let dKey in db.deposits) {
+                            let dep = db.deposits[dKey];
+                            if(dep.phone === usr.phone && dep.status === 'Approved') {
+                                agentStats[usr.invitedBy].totalDeposit += Number(dep.amount);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for(let aKey in db.agentWorkers) {
+                let agUser = db.users[aKey];
+                if(agUser) {
+                    let stats = agentStats[agUser.inviteCode] || { invitedCount: 0, totalDeposit: 0 };
+                    agentWorkerHtml += `<div style="background:#ffffff; border:1px solid #cbd5e1; padding:8px; margin-bottom:6px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                        <div>
+                            <strong style="color:#0f172a; font-size:12px;">${agUser.phone}</strong> (₹${Number(agUser.balance).toFixed(2)})<br>
+                            <span style="color:#475569; font-size:10px;">UID: <b style="color:#2563eb;">${agUser.uid}</b> | Code: <b style="color:#10b981;">${agUser.inviteCode}</b></span><br>
+                            <span style="color:#d97706; font-weight:bold;">Invited Users: ${stats.invitedCount} | Total Deposit: ₹${stats.totalDeposit}</span>
+                        </div>
+                        <button class="auth-btn" style="padding:3px 6px; margin:0; background:#ef4444; font-size:10px; width:auto;" onclick="removeAgentWorker('${aKey}')">Remove</button>
+                    </div>`;
+                }
+            }
+        }
+        document.getElementById('admAgentWorkerList').innerHTML = agentWorkerHtml || "No agent workers assigned yet.";
+
+        let agentSalaryHtml = "";
+        if(db.agentWorkers && db.users && db.deposits) {
+            let inviteCodeToAgent = {};
+            for(let aKey in db.agentWorkers) {
+                let agUser = db.users[aKey];
+                if(agUser && agUser.inviteCode) {
+                    inviteCodeToAgent[agUser.inviteCode] = agUser.phone;
+                }
+            }
+
+            for(let depKey in db.deposits) {
+                let d = db.deposits[depKey];
+                if(d.status === 'Approved') {
+                    let depositorUser = null;
+                    for(let uKey in db.users) {
+                        if(db.users[uKey].phone === d.phone) {
+                            depositorUser = db.users[uKey];
+                            break;
+                        }
+                    }
+
+                    if(depositorUser && depositorUser.invitedBy && inviteCodeToAgent[depositorUser.invitedBy]) {
+                        let agentPhone = inviteCodeToAgent[depositorUser.invitedBy];
+                        let calculatedSalary = Number(d.amount) * 0.05;
+
+                        agentSalaryHtml += `<div style="background:#ffffff; border:1px solid #cbd5e1; padding:8px; margin-bottom:6px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                            <div>
+                                Agent: <strong style="color:#2563eb;">${agentPhone}</strong><br>
+                                Invited User: <b>${d.phone}</b> deposited <b>₹${d.amount}</b><br>
+                                <span style="color:#10b981; font-weight:bold;">Salary: ₹${calculatedSalary.toFixed(2)} (Editable)</span>
+                            </div>
+                            <button class="auth-btn" style="padding:5px 10px; margin:0; background:#10b981; font-size:11px; width:auto;" onclick="creditAgentSalary('${agentPhone}', '', '${d.phone}', ${d.amount})">Credit Salary</button>
+                        </div>`;
+                    }
+                }
+            }
+        }
+        document.getElementById('admAgentSalaryList').innerHTML = agentSalaryHtml || "No eligible agent deposit rewards found.";
+
+        let adminPassHtml = "";
+        if(db.adminPasses) {
+            for(let admUser in db.adminPasses) {
+                adminPassHtml += `<div style="background:#f1f5f9; padding:5px 8px; margin-bottom:3px; border-radius:6px; border:1px solid #cbd5e1;">Username: <b>${admUser}</b> | Password: <b style="color:#2563eb;">${db.adminPasses[admUser]}</b></div>`;
+            }
+        }
+        document.getElementById('admPassListContainer').innerHTML = adminPassHtml || "No additional admins found.";
+
+        let depHtml = "";
+        let depHistHtml = "";
+        if(db.deposits) {
+            for(let k in db.deposits) {
+                let d = db.deposits[k];
+                let dateStr = d.timestamp ? new Date(d.timestamp).toLocaleString() : '';
+                if(d.status === 'Pending') {
+                    depHtml += `<div style="background:#ffffff; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid #cbd5e1;">
+                        <div><strong>${d.phone}</strong> (UID: <b style="color:#2563eb;">${d.uid || 'N/A'}</b>) - ₹${d.amount} (UTR: ${d.utr})</div>
+                        <div style="margin-top:5px; display:flex; gap:5px;">
+                            <button class="auth-btn" style="flex:1; padding:5px; background:#10b981; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin:0; font-size:11px;" onclick="processDeposit('${k}', 'Approved')">Approve</button>
+                            <button class="auth-btn" style="flex:1; padding:5px; background:#ef4444; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin:0; font-size:11px;" onclick="processDeposit('${k}', 'Rejected')">Reject</button>
+                        </div>
+                    </div>`;
+                } else {
+                    let color = d.status === 'Approved' ? '#10b981' : '#ef4444';
+                    depHistHtml += `<div style="background:#ffffff; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid #cbd5e1; font-size:11px;">
+                        User: <strong>${d.phone}</strong> | Amount: <b>₹${d.amount}</b> | UTR: ${d.utr}<br>Date: ${dateStr}<br>Status: <span style="color:${color}; font-weight:bold;">${d.status}</span> (${d.adminMsg || ''})
+                    </div>`;
+                }
+            }
+        }
+        document.getElementById('admDepositList').innerHTML = depHtml || "No pending deposits.";
+        document.getElementById('admDepositHistoryList').innerHTML = depHistHtml || "No processed deposit history.";
+
+        let witHtml = "";
+        let witHistHtml = "";
+        if(db.withdraws) {
+            for(let k in db.withdraws) {
+                let w = db.withdraws[k];
+                let dateStr = w.timestamp ? new Date(w.timestamp).toLocaleString() : '';
+                if(w.status === 'Pending') {
+                    let qrImgHtml = w.qrImage ? `<img src="${w.qrImage}" class="qr-thumb-admin" title="Double click to download image" ondblclick="downloadAdminQrImage('${w.qrImage}')">` : '<span style="color:#ef4444;">No QR</span>';
+                    
+                    witHtml += `<div style="background:#ffffff; padding:8px; margin-bottom:6px; border-radius:6px; border:1px solid #cbd5e1; display:flex; gap:8px; align-items:center;">
+                        <div style="flex:1;">
+                            <div>User: <strong>${w.phone}</strong> (UID: <b style="color:#2563eb;">${w.uid || 'N/A'}</b>)</div>
+                            <div>Amount: <strong style="color:#10b981;">₹${w.amount}</strong></div>
+                            <div style="font-size:11px; color:#475569; margin-top:2px;">Name: ${w.name}<br>UPI: ${w.upi}</div>
+                        </div>
+                        <div style="text-align:center;">
+                            ${qrImgHtml}
+                            <div style="font-size:8px; color:#475569; margin-top:1px;">(DblClick)</div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:3px;">
+                            <button class="auth-btn" style="padding:4px 8px; background:#10b981; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px; margin:0; width:auto;" onclick="processWithdrawWithMsg('${k}', 'Approved')">Approve</button>
+                            <button class="auth-btn" style="padding:4px 8px; background:#ef4444; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px; margin:0; width:auto;" onclick="processWithdrawWithMsg('${k}', 'Rejected')">Reject</button>
+                        </div>
+                    </div>`;
+                } else {
+                    let color = w.status === 'Approved' ? '#10b981' : '#ef4444';
+                    witHistHtml += `<div style="background:#ffffff; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid #cbd5e1; font-size:11px;">
+                        User: <strong>${w.phone}</strong> | Amount: <b>₹${w.amount}</b> | UPI: ${w.upi}<br>Date: ${dateStr}<br>Status: <span style="color:${color}; font-weight:bold;">${w.status}</span> (${w.adminMsg || ''})
+                    </div>`;
+                }
+            }
+        }
+        document.getElementById('admWithdrawList').innerHTML = witHtml || "No pending withdrawals.";
+        document.getElementById('admWithdrawHistoryList').innerHTML = witHistHtml || "No processed withdrawal history.";
+    }
+
+    window.downloadAdminQrImage = function(base64Data) {
+        if(confirm("Do you want to save/download this QR code to your device?")) {
+            let a = document.createElement('a');
+            a.href = base64Data;
+            a.download = `Withdrawal_QR_${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    }
+
+    window.deleteUserByAdmin = function(userKey, phone) {
+        if(confirm(`Are you sure you want to delete user ${phone}? Account will be immediately unregistered.`)) {
+            remove(ref(database, `ygwin_db/users/${userKey}`)).then(() => {
+                alert(`User ${phone} deleted successfully!`);
+            });
+        }
+    }
+
+    window.handleAdminQrUpload = function(event) {
+        let file = event.target.files[0];
+        if(file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                tempDepositQrBase64 = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    window.saveAdminQr = function() {
+        if(!tempDepositQrBase64) { alert("Please select a QR image from gallery first!"); return; }
+        set(ref(database, 'ygwin_db/qr'), tempDepositQrBase64).then(() => {
+            alert("Global Deposit QR Code uploaded successfully and saved persistently!");
+        });
+    }
+
+    window.saveAdminOverride = function() {
+        let val = document.getElementById('admForceOutcome').value;
+        set(ref(database, 'ygwin_db/control/algorithm'), val).then(() => {
+            alert(`Admin Algorithm updated and saved persistently to: ${val ? val : "Pure Random"}`);
+        });
+    }
+
+    window.toggleUserStatus = function(userKey) {
+        get(ref(database, `ygwin_db/users/${userKey}`)).then((snapshot) => {
+            let u = snapshot.val();
+            if(u) {
+                update(ref(database, `ygwin_db/users/${userKey}`), { isActive: !u.isActive });
+            }
+        });
+    }
+
+    window.processDeposit = function(depKey, status) {
+        let customMsg = prompt(`Enter custom message for deposit ${status} (Optional):`, status === 'Approved' ? 'Deposit Approved Successfully' : 'Deposit Rejected');
+        if(customMsg === null) return;
+
+        get(ref(database, `ygwin_db/deposits/${depKey}`)).then((snapshot) => {
+            let dep = snapshot.val();
+            if(dep && dep.status === 'Pending') {
+                update(ref(database, `ygwin_db/deposits/${depKey}`), { status: status, adminMsg: customMsg });
+                if(status === 'Approved') {
+                    get(ref(database, 'ygwin_db/users')).then((snap) => {
+                        let usersObj = snap.val() || {};
+                        let depositingUser = null;
+                        let depositingUserKey = null;
+
+                        for(let uKey in usersObj) {
+                            if(usersObj[uKey].phone === dep.phone) {
+                                depositingUser = usersObj[uKey];
+                                depositingUserKey = uKey;
+                                break;
+                            }
+                        }
+
+                        if(depositingUser) {
+                            let newBal = Number(depositingUser.balance) + Number(dep.amount);
+                            update(ref(database, `ygwin_db/users/${depositingUserKey}`), { balance: newBal });
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    window.processWithdrawWithMsg = function(witKey, status) {
+        let customMsg = prompt(`Enter custom message for withdrawal ${status} (Optional):`, status === 'Approved' ? 'Withdrawal Successful' : 'Withdrawal Rejected');
+        if(customMsg === null) return;
+
+        get(ref(database, `ygwin_db/withdraws/${witKey}`)).then((snapshot) => {
+            let wit = snapshot.val();
+            if(wit && wit.status === 'Pending') {
+                update(ref(database, `ygwin_db/withdraws/${witKey}`), { status: status, adminMsg: customMsg });
+                if(status === 'Rejected') {
+                    get(ref(database, 'ygwin_db/users')).then((snap) => {
+                        let usersObj = snap.val() || {};
+                        for(let uKey in usersObj) {
+                            if(usersObj[uKey].phone === wit.phone) {
+                                let newBal = Number(usersObj[uKey].balance) + Number(wit.amount);
+                                update(ref(database, `ygwin_db/users/${uKey}`), { balance: newBal });
+                                break;
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
